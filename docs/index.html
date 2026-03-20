@@ -564,29 +564,33 @@ function base64ToBlob(base64){
   return new Blob([arr],{type:mime});
 }
 
-async function uploadPhotosToTelegram(secs, username){
+async function uploadPhotosToTelegram(secs){
   const allPhotos=[];
   secs.forEach(sec=>{
     sec.items.forEach((item,ii)=>{
       const k=key(sec.id,ii);
       if(state[k]?.photos?.length){
-        state[k].photos.forEach(photo=>{
-          allPhotos.push({photo, caption:`📸 SHIFT_PHOTO | ${username} | ${sec.title}: ${item.t}`});
-        });
+        state[k].photos.forEach(photo=>allPhotos.push(photo));
       }
     });
   });
   if(!allPhotos.length) return 0;
+
+  // Telegram sendMediaGroup: максимум 10 фото за раз
+  const chunks=[];
+  for(let i=0;i<allPhotos.length;i+=10) chunks.push(allPhotos.slice(i,i+10));
+
   let sent=0;
-  for(const {photo,caption} of allPhotos){
+  for(const chunk of chunks){
     try{
       const fd=new FormData();
       fd.append('chat_id', REPORT_CHAT_ID_JS);
-      fd.append('photo', base64ToBlob(photo), 'photo.jpg');
-      fd.append('caption', caption);
-      const res=await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,{method:'POST',body:fd});
-      if(res.ok) sent++;
-    }catch(e){ console.error('Photo upload failed',e); }
+      const mediaArr=chunk.map((_,i)=>({type:'photo',media:`attach://photo${i}`}));
+      fd.append('media', JSON.stringify(mediaArr));
+      chunk.forEach((photo,i)=>fd.append(`photo${i}`, base64ToBlob(photo), `photo${i}.jpg`));
+      const res=await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup`,{method:'POST',body:fd});
+      if(res.ok) sent+=chunk.length;
+    }catch(e){ console.error('Album upload failed',e); }
   }
   return sent;
 }
@@ -628,9 +632,7 @@ async function submitShift(){
   // Сначала загружаем фото
   if(photos>0){
     sb.innerHTML=`<span>📸</span><span>Отправляем фото...</span>`;
-    const user=tg?.initDataUnsafe?.user;
-    const username=user?(user.username?`@${user.username}`:user.first_name):'Сотрудник';
-    await uploadPhotosToTelegram(secs, username);
+    await uploadPhotosToTelegram(secs);
   }
 
   sb.innerHTML='<span>⏳</span><span>Отправляем отчёт...</span>';

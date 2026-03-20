@@ -171,12 +171,12 @@ input[type=file]{display:none}
       <div class="shift-card day" onclick="startShift('day')">
         <span class="shift-icon">🌅</span>
         <div class="shift-label">ДЕНЬ</div>
-        <div class="shift-desc">08:00 — 20:00<br>Дневная смена</div>
+        <div class="shift-desc">09:00 — 21:00<br>Дневная смена</div>
       </div>
       <div class="shift-card night" onclick="startShift('night')">
         <span class="shift-icon">🌙</span>
         <div class="shift-label">НОЧЬ</div>
-        <div class="shift-desc">20:00 — 08:00<br>Ночная смена</div>
+        <div class="shift-desc">21:00 — 09:00<br>Ночная смена</div>
       </div>
     </div>
   </div>
@@ -491,7 +491,7 @@ function toggleTask(i){
 
 function makeHandover(){
   const isDay=shiftType==='day';
-  const label=isDay?'ПЕРЕДАЧА СМЕНЫ (20:00 – 21:00)':'ПЕРЕДАЧА СМЕНЫ (08:00 – 09:00)';
+  const label=isDay?'ПЕРЕДАЧА СМЕНЫ (21:00 – 22:00)':'ПЕРЕДАЧА СМЕНЫ (09:00 – 10:00)';
   const wrap=document.createElement('div');
   wrap.innerHTML=`
     <div class="handover-card">

@@ -230,6 +230,10 @@ if (tg) {
   tg.expand();
 }
 
+// ⚠️ Репозиторий должен быть ПРИВАТНЫМ — токен не для публичного доступа
+const BOT_TOKEN = '8714962236:AAHQ0gH2QczdzZf4RDmEhei6AjOYRkFnYtc';
+const REPORT_CHAT_ID_JS = '-1003820148218';
+
 const DAYS = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 const WEEKLY = {
   0:['Генеральная проверка всех зон','Инвентаризация — составить список закупок'],
@@ -551,10 +555,45 @@ function updateProgress(){
   sp2.textContent = !allChecklistDone ? `обход: ещё ${total-done}` : '';
 }
 
-function submitShift(){
+function base64ToBlob(base64){
+  const [header,data]=base64.split(',');
+  const mime=header.match(/:(.*?);/)[1];
+  const binary=atob(data);
+  const arr=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) arr[i]=binary.charCodeAt(i);
+  return new Blob([arr],{type:mime});
+}
+
+async function uploadPhotosToTelegram(secs, username){
+  const allPhotos=[];
+  secs.forEach(sec=>{
+    sec.items.forEach((item,ii)=>{
+      const k=key(sec.id,ii);
+      if(state[k]?.photos?.length){
+        state[k].photos.forEach(photo=>{
+          allPhotos.push({photo, caption:`📸 SHIFT_PHOTO | ${username} | ${sec.title}: ${item.t}`});
+        });
+      }
+    });
+  });
+  if(!allPhotos.length) return 0;
+  let sent=0;
+  for(const {photo,caption} of allPhotos){
+    try{
+      const fd=new FormData();
+      fd.append('chat_id', REPORT_CHAT_ID_JS);
+      fd.append('photo', base64ToBlob(photo), 'photo.jpg');
+      fd.append('caption', caption);
+      const res=await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`,{method:'POST',body:fd});
+      if(res.ok) sent++;
+    }catch(e){ console.error('Photo upload failed',e); }
+  }
+  return sent;
+}
+
+async function submitShift(){
   const sb=document.getElementById('submit-btn');
   sb.disabled=true;
-  sb.innerHTML='<span>⏳</span><span>Отправляем...</span>';
 
   const secs=shiftType==='day'?DAY:NIGHT;
   const total=secs.reduce((a,s)=>a+s.items.length,0);
@@ -572,36 +611,30 @@ function submitShift(){
   const totalTasks=todayTasks.length;
   const incompleteTasks=todayTasks.filter((_,i)=>!taskState[i]);
 
-  // Формируем неотмеченные пункты по секциям
-  const unchecked = {};
-  secs.forEach(sec => {
-    const missed = sec.items.filter((_,ii) => !state[key(sec.id,ii)]?.done).map(i=>i.t);
-    if(missed.length) unchecked[sec.title] = missed;
+  const unchecked={};
+  secs.forEach(sec=>{
+    const missed=sec.items.filter((_,ii)=>!state[key(sec.id,ii)]?.done).map(i=>i.t);
+    if(missed.length) unchecked[sec.title]=missed;
   });
 
-  // Фото (только количество — base64 слишком большой для sendData)
-  const photoCount = {};
-  secs.forEach(sec => {
-    sec.items.forEach((item,ii) => {
-      const k = key(sec.id, ii);
-      if(state[k]?.photos?.length) {
-        photoCount[item.t] = state[k].photos.length;
-      }
-    });
-  });
-
-  const payload = {
-    shift: shiftType,
-    datetime: now,
-    checklist: { done, total },
-    tasks: { done: doneTasks, total: totalTasks, incomplete: incompleteTasks },
-    handover: { next, cash, rating, notes },
-    unchecked,
-    photo_count: photoCount,
-    photos_total: photos,
+  const payload={
+    shift:shiftType, datetime:now,
+    checklist:{done,total},
+    tasks:{done:doneTasks,total:totalTasks,incomplete:incompleteTasks},
+    handover:{next,cash,rating,notes},
+    unchecked, photos_total:photos,
   };
 
-  // Показываем экран завершения
+  // Сначала загружаем фото
+  if(photos>0){
+    sb.innerHTML=`<span>📸</span><span>Отправляем фото...</span>`;
+    const user=tg?.initDataUnsafe?.user;
+    const username=user?(user.username?`@${user.username}`:user.first_name):'Сотрудник';
+    await uploadPhotosToTelegram(secs, username);
+  }
+
+  sb.innerHTML='<span>⏳</span><span>Отправляем отчёт...</span>';
+
   document.getElementById('done-title').textContent=isDay?'✅ Дневная смена сдана!':'✅ Ночная смена сдана!';
   document.getElementById('done-sub').textContent='Отчёт отправлен управляющему. '+(isDay?'Хорошего вечера! 🌆':'Хорошего отдыха! 😴');
   document.getElementById('done-stats').innerHTML=`
@@ -610,20 +643,15 @@ function submitShift(){
     <div class="stat-row"><span class="stat-label">Обход</span><span class="stat-val" style="color:var(--green)">✅ ${done} / ${total}</span></div>
     <div class="stat-row"><span class="stat-label">Задачи</span><span class="stat-val" style="color:${doneTasks===totalTasks?'var(--green)':'var(--amber)'}">${doneTasks} / ${totalTasks}${doneTasks<totalTasks?' ⚠️':' ✅'}</span></div>
     ${incompleteTasks.length?`<div class="stat-row"><span class="stat-label" style="color:var(--amber)">Не выполнено</span><span class="stat-val" style="font-size:12px;color:var(--amber)">${incompleteTasks.join(', ')}</span></div>`:''}
-    <div class="stat-row"><span class="stat-label">Фото приложено</span><span class="stat-val">${photos}</span></div>
+    <div class="stat-row"><span class="stat-label">Фото отправлено</span><span class="stat-val">${photos}</span></div>
     <div class="stat-row"><span class="stat-label">Касса</span><span class="stat-val">${cash||'—'} ₽</span></div>
     <div class="stat-row"><span class="stat-label">Принимает смену</span><span class="stat-val">${next||'—'}</span></div>
     <div class="stat-row"><span class="stat-label">Оценка смены</span><span class="stat-val">${rating?ratingMap[rating]:'—'}</span></div>
     ${notes?`<div class="stat-row"><span class="stat-label">Заметки</span><span class="stat-val">${notes}</span></div>`:''}
   `;
 
-  // Отправляем данные боту через Telegram WebApp API
-  setTimeout(() => {
-    showScreen('done');
-    if (tg) {
-      tg.sendData(JSON.stringify(payload));
-    }
-  }, 600);
+  showScreen('done');
+  if(tg) tg.sendData(JSON.stringify(payload));
 }
 
 function showToast(msg){

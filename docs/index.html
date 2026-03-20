@@ -550,9 +550,9 @@ function updateProgress(){
   document.getElementById('prog-count').textContent=done+' / '+total;
   const sb=document.getElementById('submit-btn');
   const sp2=document.getElementById('sub-prog');
-  const allChecklistDone = done >= total;
-  sb.disabled = !allChecklistDone;
-  sp2.textContent = !allChecklistDone ? `обход: ещё ${total-done}` : '';
+  // TODO: вернуть обязательное заполнение после тестов
+  sb.disabled = false;
+  sp2.textContent = done < total ? `обход: ${done}/${total}` : '';
 }
 
 function base64ToBlob(base64){

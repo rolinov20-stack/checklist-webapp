@@ -151,6 +151,27 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .restart-btn{width:100%;max-width:360px;padding:15px;border:none;border-radius:var(--r);background:linear-gradient(135deg,var(--purple),var(--cyan));font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 20px rgba(124,58,237,0.3);transition:all 0.2s}
 .restart-btn:active{transform:scale(0.98)}
 
+/* MENU */
+.menu-header{padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.menu-cards{padding:16px;display:flex;flex-direction:column;gap:12px}
+.menu-card{background:var(--card);border-radius:16px;padding:20px;cursor:pointer;transition:all 0.2s;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:16px;user-select:none}
+.menu-card:active{transform:scale(0.97)}
+.menu-card-icon{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.mc-checklist .menu-card-icon{background:rgba(124,58,237,0.2)}
+.mc-tasks .menu-card-icon{background:rgba(245,158,11,0.15)}
+.mc-closing .menu-card-icon{background:rgba(6,182,212,0.15)}
+.menu-card-info{flex:1;min-width:0}
+.menu-card-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:0.3px;margin-bottom:3px}
+.mc-checklist .menu-card-title{color:var(--purple2)}
+.mc-tasks .menu-card-title{color:var(--amber)}
+.mc-closing .menu-card-title{color:var(--cyan)}
+.menu-card-desc{font-size:12px;color:var(--text3);line-height:1.4;margin-bottom:6px}
+.menu-pill{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;display:inline-block}
+.mp-purple{background:rgba(124,58,237,0.2);color:var(--purple2)}
+.mp-amber{background:rgba(245,158,11,0.15);color:var(--amber)}
+.mp-cyan{background:rgba(6,182,212,0.15);color:var(--cyan)}
+.menu-arrow{color:var(--text3);font-size:22px;flex-shrink:0}
+
 /* TOAST */
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;z-index:9999;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
 .toast.show{transform:translateX(-50%) translateY(0)}
@@ -182,10 +203,52 @@ input[type=file]{display:none}
   </div>
 </div>
 
+<!-- MENU -->
+<div class="screen" id="screen-menu">
+  <div class="menu-header">
+    <div class="back-btn" onclick="goBackToWelcome()">←</div>
+    <div class="header-logo">CS</div>
+    <div class="header-info">
+      <h1 id="menu-title">Дневная смена</h1>
+      <p id="menu-sub">пр. Героев, 31</p>
+    </div>
+    <div class="header-badge badge-day" id="menu-badge-shift">ДЕНЬ</div>
+  </div>
+  <div class="menu-cards">
+    <div class="menu-card mc-checklist" onclick="openChecklist()">
+      <div class="menu-card-icon">✅</div>
+      <div class="menu-card-info">
+        <div class="menu-card-title">Чеклист принятия смены</div>
+        <div class="menu-card-desc">Обход помещений — вход, бар, зал, туалеты, VIP</div>
+        <div class="menu-pill mp-purple" id="mp-checklist">0 / 0</div>
+      </div>
+      <div class="menu-arrow">›</div>
+    </div>
+    <div class="menu-card mc-tasks" onclick="openTasks()">
+      <div class="menu-card-icon">📋</div>
+      <div class="menu-card-info">
+        <div class="menu-card-title">Задачи на смену</div>
+        <div class="menu-card-desc">Еженедельные задачи на сегодня</div>
+        <div class="menu-pill mp-amber" id="mp-tasks">0 / 0</div>
+      </div>
+      <div class="menu-arrow">›</div>
+    </div>
+    <div class="menu-card mc-closing" onclick="openClosing()">
+      <div class="menu-card-icon">🤝</div>
+      <div class="menu-card-info">
+        <div class="menu-card-title">Закрытие смены</div>
+        <div class="menu-card-desc">Передача смены, касса, оценка и отправка отчёта</div>
+        <div class="menu-pill mp-cyan">Заполнить и отправить</div>
+      </div>
+      <div class="menu-arrow">›</div>
+    </div>
+  </div>
+</div>
+
 <!-- CHECKLIST -->
 <div class="screen" id="screen-checklist">
   <div class="app-header">
-    <div class="back-btn" onclick="goBack()">←</div>
+    <div class="back-btn" onclick="goBackToMenu()">←</div>
     <div class="header-logo">CS</div>
     <div class="header-info">
       <h1 id="h-title">Дневная смена</h1>
@@ -202,8 +265,36 @@ input[type=file]{display:none}
     <div class="sec-dots" id="sec-dots"></div>
   </div>
   <div class="scroll-body" id="scroll-body"></div>
+</div>
+
+<!-- TASKS -->
+<div class="screen" id="screen-tasks">
+  <div class="app-header">
+    <div class="back-btn" onclick="goBackToMenu()">←</div>
+    <div class="header-logo">CS</div>
+    <div class="header-info">
+      <h1>Задачи на смену</h1>
+      <p id="tasks-sub">пр. Героев, 31</p>
+    </div>
+    <div class="header-badge badge-day" id="tasks-badge">ДЕНЬ</div>
+  </div>
+  <div id="tasks-body" style="padding:16px 0 120px"></div>
+</div>
+
+<!-- CLOSING -->
+<div class="screen" id="screen-closing">
+  <div class="app-header">
+    <div class="back-btn" onclick="goBackToMenu()">←</div>
+    <div class="header-logo">CS</div>
+    <div class="header-info">
+      <h1>Закрытие смены</h1>
+      <p id="closing-sub">пр. Героев, 31</p>
+    </div>
+    <div class="header-badge badge-day" id="closing-badge">ДЕНЬ</div>
+  </div>
+  <div class="scroll-body" id="closing-body"></div>
   <div class="submit-wrap">
-    <button class="submit-btn day" id="submit-btn" onclick="submitShift()" disabled>
+    <button class="submit-btn day" id="submit-btn" onclick="submitShift()">
       <span>✅</span><span id="sub-label">Завершить и отправить отчёт</span><span class="sub-prog" id="sub-prog"></span>
     </button>
   </div>
@@ -346,26 +437,83 @@ const NIGHT = [
 let shiftType=null, state={}, taskState={}, rating=null;
 function key(sid,ii){return sid+'_'+ii}
 let photoKey=null;
+let tasksRendered=false, closingRendered=false;
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+id).classList.add('active');
   window.scrollTo(0,0);
 }
-function goBack(){if(confirm('Выйти? Прогресс этой вкладки сохранится.'))showScreen('welcome')}
-function resetApp(){shiftType=null;state={};taskState={};rating=null;showScreen('welcome')}
+function goBackToWelcome(){if(confirm('Выйти? Прогресс сохранится.'))showScreen('welcome')}
+function goBackToMenu(){showScreen('menu');updateMenuBadges();}
+function resetApp(){shiftType=null;state={};taskState={};rating=null;tasksRendered=false;closingRendered=false;showScreen('welcome')}
 
 function startShift(type){
   shiftType=type; state={}; taskState={}; rating=null;
+  tasksRendered=false; closingRendered=false;
   const isDay=type==='day';
+
+  // Меню
+  document.getElementById('menu-title').textContent=isDay?'Дневная смена':'Ночная смена';
+  const mb=document.getElementById('menu-badge-shift');
+  mb.textContent=isDay?'ДЕНЬ':'НОЧЬ';
+  mb.className='header-badge '+(isDay?'badge-day':'badge-night');
+
+  // Чеклист
   document.getElementById('h-title').textContent=isDay?'Дневная смена':'Ночная смена';
   document.getElementById('h-sub').textContent=isDay?'Утренний обход · пр. Героев, 31':'Вечерний обход · пр. Героев, 31';
   const b=document.getElementById('h-badge');
   b.textContent=isDay?'ДЕНЬ':'НОЧЬ';
   b.className='header-badge '+(isDay?'badge-day':'badge-night');
   document.getElementById('prog-bar').className='progress-fill '+(isDay?'fill-day':'fill-night');
+
+  renderBody(); updateProgress(); updateMenuBadges();
+  showScreen('menu');
+}
+
+function openChecklist(){showScreen('checklist');}
+
+function openTasks(){
+  const isDay=shiftType==='day';
+  const tb=document.getElementById('tasks-badge');
+  tb.textContent=isDay?'ДЕНЬ':'НОЧЬ';
+  tb.className='header-badge '+(isDay?'badge-day':'badge-night');
+  if(!tasksRendered){
+    const body=document.getElementById('tasks-body');
+    body.innerHTML='';
+    body.appendChild(makeTasksBlock());
+    tasksRendered=true;
+  }
+  showScreen('tasks');
+}
+
+function openClosing(){
+  const isDay=shiftType==='day';
+  const cb=document.getElementById('closing-badge');
+  cb.textContent=isDay?'ДЕНЬ':'НОЧЬ';
+  cb.className='header-badge '+(isDay?'badge-day':'badge-night');
   document.getElementById('submit-btn').className='submit-btn '+(isDay?'day':'night');
-  renderBody(); showScreen('checklist'); updateProgress();
+  if(!closingRendered){
+    const body=document.getElementById('closing-body');
+    body.innerHTML='';
+    body.appendChild(makeHandover());
+    closingRendered=true;
+  }
+  showScreen('closing');
+}
+
+function updateMenuBadges(){
+  if(!shiftType) return;
+  const secs=shiftType==='day'?DAY:NIGHT;
+  const total=secs.reduce((a,s)=>a+s.items.length,0);
+  const done=Object.values(state).filter(s=>s.done).length;
+  const mp=document.getElementById('mp-checklist');
+  if(mp) mp.textContent=done+' / '+total;
+  const dow=new Date().getDay();
+  const todayTasks=WEEKLY[dow]||[];
+  const doneTasks=Object.values(taskState).filter(Boolean).length;
+  const mpt=document.getElementById('mp-tasks');
+  if(mpt) mpt.textContent=doneTasks+' / '+todayTasks.length;
 }
 
 function renderBody(){
@@ -395,8 +543,6 @@ function renderBody(){
       list.appendChild(makeItem(sec.id,ii,item));
     });
   });
-  body.appendChild(makeTasksBlock());
-  body.appendChild(makeHandover());
 }
 
 function makeItem(sid,ii,item){
@@ -553,6 +699,7 @@ function updateProgress(){
   // TODO: вернуть обязательное заполнение после тестов
   sb.disabled = false;
   sp2.textContent = done < total ? `обход: ${done}/${total}` : '';
+  updateMenuBadges();
 }
 
 function base64ToBlob(base64){

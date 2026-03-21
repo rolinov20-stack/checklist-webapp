@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Cyber Space — Смены</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080810;--bg2:#0e0e1c;--bg3:#141428;--card:#12122a;--card2:#1a1a35;
+  --purple:#7c3aed;--purple2:#a855f7;--cyan:#06b6d4;--cyan2:#22d3ee;
+  --amber:#f59e0b;--green:#10b981;--red:#ef4444;
+  --text:#f0f0ff;--text2:#8888aa;--text3:#555577;
+  --border:rgba(124,58,237,0.2);--border2:rgba(6,182,212,0.15);
+  --glow-p:0 0 20px rgba(124,58,237,0.3);--glow-c:0 0 20px rgba(6,182,212,0.3);
+  --r:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100vh;overflow-x:hidden}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px)}
+
+.screen{display:none;min-height:100vh}
+.screen.active{display:block}
+
+/* WELCOME */
+.welcome-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;background:radial-gradient(ellipse at 50% 0%,rgba(124,58,237,0.15) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(6,182,212,0.1) 0%,transparent 50%),var(--bg)}
+.logo-wrap{width:90px;height:90px;border-radius:22px;margin-bottom:28px;background:linear-gradient(135deg,#7c3aed,#06b6d4);display:flex;align-items:center;justify-content:center;box-shadow:var(--glow-p);animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.logo-letters{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;color:#fff;letter-spacing:2px}
+.welcome-title{font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;background:linear-gradient(135deg,#fff,var(--cyan2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:6px;letter-spacing:1px}
+.welcome-sub{font-size:14px;color:var(--text2);text-align:center;margin-bottom:40px}
+.shift-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:380px}
+.shift-card{background:var(--card);border-radius:16px;padding:22px 16px;cursor:pointer;transition:all 0.2s;text-align:center;border:1px solid transparent;user-select:none}
+.shift-card:active{transform:scale(0.96)}
+.shift-card.day:hover,.shift-card.day:active{border-color:var(--purple);box-shadow:var(--glow-p)}
+.shift-card.night:hover,.shift-card.night:active{border-color:var(--cyan);box-shadow:var(--glow-c)}
+.shift-icon{font-size:38px;margin-bottom:10px;display:block}
+.shift-label{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:600;letter-spacing:0.5px;margin-bottom:4px}
+.shift-card.day .shift-label{color:var(--purple2)}
+.shift-card.night .shift-label{color:var(--cyan)}
+.shift-desc{font-size:12px;color:var(--text3);line-height:1.5}
+
+/* HEADER */
+.app-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px}
+.back-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:18px;color:var(--text2)}
+.header-logo{width:36px;height:36px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--purple),var(--cyan));display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px}
+.header-info{flex:1;min-width:0}
+.header-info h1{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.header-info p{font-size:11px;color:var(--text2);margin-top:1px}
+.header-badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;flex-shrink:0}
+.badge-day{background:rgba(124,58,237,0.2);color:var(--purple2);border:1px solid rgba(124,58,237,0.3)}
+.badge-night{background:rgba(6,182,212,0.15);color:var(--cyan);border:1px solid rgba(6,182,212,0.25)}
+
+/* PROGRESS */
+.progress-wrap{padding:12px 16px;background:var(--bg2);border-bottom:1px solid rgba(255,255,255,0.04)}
+.progress-header{display:flex;justify-content:space-between;margin-bottom:8px}
+.progress-label{font-size:12px;color:var(--text2);font-weight:500}
+.progress-count{font-size:12px;color:var(--text2)}
+.progress-track{height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px;transition:width 0.4s}
+.fill-day{background:linear-gradient(90deg,var(--purple),var(--purple2))}
+.fill-night{background:linear-gradient(90deg,var(--cyan),var(--cyan2))}
+.sec-dots{display:flex;gap:4px;margin-top:6px}
+.sec-dot{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,0.07);transition:background 0.3s}
+.sec-dot.done{background:var(--green)}
+.sec-dot.partial{background:var(--amber)}
+
+/* SECTIONS */
+.section-block{margin:0}
+.section-header{padding:14px 16px 8px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.section-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.si-purple{background:rgba(124,58,237,0.2)}
+.si-cyan{background:rgba(6,182,212,0.15)}
+.si-green{background:rgba(16,185,129,0.15)}
+.si-amber{background:rgba(245,158,11,0.15)}
+.section-title-text{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;letter-spacing:0.3px;flex:1;color:var(--text)}
+.section-count{font-size:11px;color:var(--text3)}
+.sec-prog{height:2px;background:rgba(255,255,255,0.05)}
+.sec-prog-fill{height:100%;background:var(--green);transition:width 0.3s}
+.items-list{padding:4px 0 8px}
+.check-item{padding:12px 16px;display:flex;align-items:flex-start;gap:12px;cursor:pointer;transition:background 0.15s;border-bottom:1px solid rgba(255,255,255,0.03)}
+.check-item:active{background:rgba(255,255,255,0.03)}
+.check-item.done{background:rgba(16,185,129,0.04)}
+.check-item.done .item-text{color:var(--text3);text-decoration:line-through}
+.checkmark{width:20px;height:20px;border-radius:6px;flex-shrink:0;margin-top:2px;border:1.5px solid var(--text3);display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-size:11px;font-weight:700}
+.check-item.done .checkmark{background:var(--green);border-color:var(--green);color:#fff}
+.item-content{flex:1;min-width:0}
+.item-text{font-size:13.5px;line-height:1.5;color:var(--text)}
+.photo-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--cyan);background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);border-radius:4px;padding:2px 7px;margin-top:5px;cursor:pointer;user-select:none}
+.photo-badge.has{color:var(--green);background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.25)}
+.photo-item{border-left:3px solid var(--cyan)}
+.photo-item.done{border-left-color:var(--green);background:rgba(16,185,129,0.04)}
+.photo-item.done .item-text{color:var(--text3)}
+.cam-icon{font-size:22px;flex-shrink:0;margin-top:1px;width:28px;text-align:center}
+.cam-hint{font-size:11px;color:var(--cyan);margin-top:3px}
+.photo-item.done .cam-hint{color:var(--green)}
+.photo-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.photo-wrap{position:relative;display:inline-block}
+.photo-thumb{width:56px;height:56px;border-radius:7px;object-fit:cover;border:1px solid rgba(255,255,255,0.1);display:block}
+.photo-rm{position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(239,68,68,0.9);display:flex;align-items:center;justify-content:center;font-size:9px;cursor:pointer;color:#fff;font-weight:700}
+.section-divider{height:8px;background:var(--bg);border-top:1px solid rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.03)}
+
+/* TASKS */
+.tasks-card{margin:12px 16px;background:var(--card);border-radius:var(--r);border:1px solid var(--border);overflow:hidden}
+.tasks-hdr{padding:12px 14px;background:rgba(124,58,237,0.1);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600}
+.day-pill{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--purple);color:#fff;margin-left:auto}
+.task-row{padding:11px 14px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04);transition:background 0.15s}
+.task-row:last-child{border-bottom:none}
+.task-row:active{background:rgba(255,255,255,0.03)}
+.task-row.done .task-text{text-decoration:line-through;color:var(--text3)}
+.task-chk{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--text3);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-size:10px;font-weight:700}
+.task-row.done .task-chk{background:var(--green);border-color:var(--green);color:#fff}
+.task-text{font-size:13px;line-height:1.5;color:var(--text)}
+
+/* HANDOVER */
+.handover-card{margin:12px 16px;background:var(--card);border-radius:var(--r);border:1px solid var(--border2);overflow:hidden}
+.handover-hdr{padding:12px 14px;background:rgba(6,182,212,0.08);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;color:var(--cyan)}
+.handover-body{padding:14px;display:flex;flex-direction:column;gap:12px}
+.fl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
+.fi{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s;resize:none}
+.fi:focus{border-color:var(--cyan)}
+.fi::placeholder{color:var(--text3)}
+.cash-row{display:flex;align-items:center;gap:8px}
+.cash-row .fi{text-align:right;font-size:18px;font-weight:600;width:150px}
+.cash-sym{font-size:20px;font-weight:600;color:var(--text2)}
+.rating-grid{display:flex;gap:8px}
+.rb{flex:1;padding:10px 4px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);cursor:pointer;text-align:center;font-size:11px;color:var(--text2);transition:all 0.2s;user-select:none}
+.rb-emoji{display:block;font-size:20px;margin-bottom:3px}
+.rb.good{background:rgba(16,185,129,0.15);border-color:var(--green);color:var(--green)}
+.rb.ok{background:rgba(245,158,11,0.15);border-color:var(--amber);color:var(--amber)}
+.rb.bad{background:rgba(239,68,68,0.15);border-color:var(--red);color:var(--red)}
+
+/* SUBMIT */
+.submit-wrap{padding:16px 16px 32px}
+.submit-btn{width:100%;padding:15px;border:none;border-radius:var(--r);font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:0.5px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.submit-btn.day{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;box-shadow:0 4px 20px rgba(124,58,237,0.35)}
+.submit-btn.night{background:linear-gradient(135deg,#0e7490,var(--cyan));color:#000;box-shadow:0 4px 20px rgba(6,182,212,0.25)}
+.submit-btn:disabled{opacity:0.4;cursor:not-allowed;box-shadow:none}
+.submit-btn:active:not(:disabled){transform:scale(0.98)}
+.sub-prog{font-size:12px;opacity:0.7}
+.scroll-body{padding-bottom:24px}
+
+/* ZONE PHOTO BUTTONS */
+.zone-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
+.zone-btn{background:var(--card2);border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:18px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all 0.2s;user-select:none;position:relative}
+.zone-btn:active{transform:scale(0.96)}
+.zone-btn.shot{background:rgba(16,185,129,0.12);border-color:var(--green)}
+.zone-btn .zone-icon{font-size:32px}
+.zone-btn .zone-label{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.3px;color:var(--text);text-align:center}
+.zone-btn .zone-hint{font-size:10px;color:var(--cyan);text-align:center}
+.zone-btn.shot .zone-hint{color:var(--green)}
+.zone-btn .zone-count{position:absolute;top:8px;right:8px;background:var(--green);color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:2px 6px}
+
+/* DONE */
+.done-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;background:radial-gradient(ellipse at 50% 30%,rgba(16,185,129,0.12) 0%,transparent 60%),var(--bg)}
+.done-icon{font-size:72px;margin-bottom:20px;animation:pop 0.5s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.done-title{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;text-align:center;margin-bottom:8px}
+.done-sub{font-size:14px;color:var(--text2);text-align:center;margin-bottom:28px;line-height:1.6}
+.done-stats{width:100%;max-width:360px;background:var(--card);border-radius:var(--r);border:1px solid var(--border);padding:16px;margin-bottom:24px}
+.stat-row{display:flex;justify-content:space-between;align-items:flex-start;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.stat-row:last-child{border-bottom:none}
+.stat-label{font-size:13px;color:var(--text2)}
+.stat-val{font-size:13px;font-weight:600;color:var(--text);text-align:right;max-width:180px}
+.restart-btn{width:100%;max-width:360px;padding:15px;border:none;border-radius:var(--r);background:linear-gradient(135deg,var(--purple),var(--cyan));font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 20px rgba(124,58,237,0.3);transition:all 0.2s}
+.restart-btn:active{transform:scale(0.98)}
+
+/* TOAST */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;z-index:9999;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+input[type=file]{display:none}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast">📷 Фото добавлено</div>
+
+<!-- WELCOME -->
+<div class="screen active" id="screen-welcome">
+  <div class="welcome-screen">
+    <div class="logo-wrap"><div class="logo-letters">CS</div></div>
+    <div class="welcome-title">CYBER SPACE</div>
+    <div class="welcome-sub">Система учёта смен · пр. Героев, 31</div>
+    <div class="shift-cards">
+      <div class="shift-card day" onclick="startShift('day')">
+        <span class="shift-icon">🌅</span>
+        <div class="shift-label">ДЕНЬ</div>
+        <div class="shift-desc">09:00 — 21:00<br>Дневная смена</div>
+      </div>
+      <div class="shift-card night" onclick="startShift('night')">
+        <span class="shift-icon">🌙</span>
+        <div class="shift-label">НОЧЬ</div>
+        <div class="shift-desc">21:00 — 09:00<br>Ночная смена</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKLIST -->
+<div class="screen" id="screen-checklist">
+  <div class="app-header">
+    <div class="back-btn" onclick="goBack()">←</div>
+    <div class="header-logo">CS</div>
+    <div class="header-info">
+      <h1 id="h-title">Дневная смена</h1>
+      <p id="h-sub">Утренний обход · пр. Героев, 31</p>
+    </div>
+    <div class="header-badge badge-day" id="h-badge">ДЕНЬ</div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-header">
+      <span class="progress-label">Прогресс</span>
+      <span class="progress-count" id="prog-count">0 / 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill fill-day" id="prog-bar" style="width:0%"></div></div>
+    <div class="sec-dots" id="sec-dots"></div>
+  </div>
+  <div class="scroll-body" id="scroll-body"></div>
+</div>
+
+<!-- DONE -->
+<div class="screen" id="screen-done">
+  <div class="done-screen">
+    <div class="done-icon">🎉</div>
+    <div class="done-title" id="done-title">Смена завершена!</div>
+    <div class="done-sub" id="done-sub">Отчёт отправлен управляющему.</div>
+    <div class="done-stats" id="done-stats"></div>
+    <button class="restart-btn" onclick="resetApp()">← Начать новую смену</button>
+  </div>
+</div>
+
+<input type="file" id="photo-input" accept="image/*" capture="environment" onchange="handlePhoto(this)">
+<input type="file" id="zone-photo-input" accept="image/*" capture="environment" onchange="handleZonePhoto(this)">
+
+<script>
+// Инициализация Telegram WebApp
+const tg = window.Telegram?.WebApp;
+if (tg) {
+  tg.ready();
+  tg.expand();
+}
+
+// ⚠️ Репозиторий должен быть ПРИВАТНЫМ — токен не для публичного доступа
+const BOT_TOKEN = '8714962236:AAHQ0gH2QczdzZf4RDmEhei6AjOYRkFnYtc';
+const REPORT_CHAT_ID_JS = '-1003820148218';
+
+const DAYS = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+const WEEKLY = {
+  0:['Генеральная проверка всех зон','Инвентаризация — составить список закупок'],
+  1:['Помыть клавиатуры во всех зонах','Протереть корпуса ПК от пыли'],
+  2:['Протереть мониторы с двух сторон','Проверить и заменить мундштуки'],
+  3:['Помыть под столами и стульями','Протереть подлокотники и основания кресел'],
+  4:['Слить и промыть кулер','Протереть витрину и полки с товаром'],
+  5:['Глубокая чистка барной стойки — все три уровня','Промыть все кальяны с мыльной водой'],
+  6:['Протереть всю периферию: мышки, наушники','Протереть входную дверь и стёкла'],
+};
+
+const DAY = [
+  {id:'entrance',icon:'🚪',color:'si-purple',title:'ВХОД',items:[
+    {t:'Все напитки / снеки / чипсы выставлены',p:false},
+    {t:'Холодильник чистый, нет разводов, окна не запотевшие',p:true},
+    {t:'Телевизор работает (выведены ценники)',p:false},
+    {t:'Микроволновка чистая внутри (нет крошек, тарелка чистая) и снаружи (нет пыли и грязи)',p:false},
+    {t:'Стойка чистая — нет сахара, остатков еды, липких разводов',p:false},
+    {t:'Чай / сахар / вода в кулере есть',p:false},
+    {t:'Слив кулера пустой, на крышке нет пыли',p:false},
+    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:true},
+  ]},
+  {id:'bar',icon:'💨',color:'si-amber',title:'ХОЛОДИЛЬНИКИ',items:[
+    {t:'Вытяжка выключена',p:false},
+    {t:'Барная стойка чистая — все три уровня: нет крошек, следов еды, липких разводов',p:false},
+    {t:'У угля ничего не стоит (кроме самого угля)',p:false},
+    {t:'Под углём ничего не лежит',p:false},
+    {t:'Электропечь чистая — нет пепла, сажи, разводов; рядом тоже чисто',p:true},
+    {t:'Кадило пустое — нет остатков табака, углей, пепла',p:false},
+    {t:'Кальяны собраны и чистые',p:true},
+    {t:'Раковина чистая внутри — ничего не лежит, нет грязи и остатков табака; рядом тоже порядок',p:true},
+    {t:'Под раковиной нет мусора, остатков табака, пол чистый',p:false},
+    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:true},
+  ]},
+  {id:'hall',icon:'🖥️',color:'si-cyan',title:'ОБЩИЙ ЗАЛ',items:[
+    {t:'Стулья стоят ровно — максимально подняты, ручки опущены, у каждого есть подушка',p:false},
+    {t:'Столы чистые — нет крошек, следов еды, липких разводов',p:false},
+    {t:'Под столами на стенке нет следов грязи и разводов',p:false},
+    {t:'Мышки стоят на месте, чистые — нет грязи и жирных отпечатков',p:false},
+    {t:'Клавиатуры: все клавиши на месте, нет жирных разводов, не залиты',p:false},
+    {t:'Мониторы подняты и стоят ±на одном уровне',p:false},
+    {t:'Коврики сухие, нет крошек и остатков еды',p:false},
+  ]},
+  {id:'wc',icon:'🚻',color:'si-green',title:'ТУАЛЕТЫ',items:[
+    {t:'Мыло есть',p:false},
+    {t:'Туалетная бумага есть',p:false},
+    {t:'Бумажные полотенца есть',p:false},
+    {t:'На зеркале нет разводов',p:false},
+    {t:'Раковина чистая',p:false},
+    {t:'Туалет чистый — нет коричневой полосы у слива',p:false},
+    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:true},
+  ]},
+  {id:'vip',icon:'👑',color:'si-purple',title:'ВИП ЗАЛ',items:[
+    {t:'Стулья стоят ровно — максимально подняты, ручки опущены, у каждого есть подушка',p:false},
+    {t:'Столы чистые — нет крошек, следов еды, липких разводов',p:false},
+    {t:'Под столами на стенке нет следов грязи и разводов',p:false},
+    {t:'Мышки стоят на месте, чистые',p:false},
+    {t:'Клавиатуры: все клавиши на месте, не залиты',p:false},
+    {t:'Мониторы подняты и стоят ±на одном уровне',p:false},
+    {t:'Коврики сухие, нет крошек и остатков еды',p:false},
+    {t:'Кондиционер выключен',p:false},
+    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:true},
+  ]},
+];
+
+const NIGHT = [
+  {id:'entrance',icon:'🚪',color:'si-cyan',title:'ВХОД',items:[
+    {t:'Все напитки / снеки / чипсы выставлены',p:false},
+    {t:'Холодильник чистый, нет разводов, окна не запотевшие',p:true},
+    {t:'Телевизор работает (выведены ценники)',p:false},
+    {t:'Стойка чистая — нет сахара, остатков еды, липких разводов',p:false},
+    {t:'Чай / сахар / вода в кулере есть',p:false},
+    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:true},
+  ]},
+  {id:'bar',icon:'💨',color:'si-amber',title:'ХОЛОДИЛЬНИКИ',items:[
+    {t:'Вытяжка в рабочем состоянии',p:false},
+    {t:'Барная стойка чистая — все три уровня',p:false},
+    {t:'Электропечь чистая — нет пепла, сажи, разводов; рядом тоже чисто',p:true},
+    {t:'Кадило пустое — нет остатков табака, углей, пепла',p:false},
+    {t:'Кальяны собраны и чистые',p:true},
+    {t:'Раковина чистая, рядом порядок',p:true},
+    {t:'Мусорка поменяна',p:true},
+  ]},
+  {id:'hall',icon:'🖥️',color:'si-purple',title:'ОБЩИЙ ЗАЛ',items:[
+    {t:'Стулья стоят ровно, у каждого есть подушка',p:false},
+    {t:'Столы чистые — нет крошек, следов еды, разводов',p:false},
+    {t:'Мышки стоят на месте, чистые',p:false},
+    {t:'Клавиатуры в порядке — не залиты',p:false},
+    {t:'Коврики сухие, нет крошек',p:false},
+  ]},
+  {id:'wc',icon:'🚻',color:'si-green',title:'ТУАЛЕТЫ',items:[
+    {t:'Мыло есть',p:false},
+    {t:'Туалетная бумага есть',p:false},
+    {t:'Бумажные полотенца есть',p:false},
+    {t:'Раковина чистая',p:false},
+    {t:'Туалет чистый',p:false},
+    {t:'Мусорка поменяна',p:true},
+  ]},
+  {id:'vip',icon:'👑',color:'si-cyan',title:'ВИП ЗАЛ',items:[
+    {t:'Стулья стоят ровно, у каждого есть подушка',p:false},
+    {t:'Столы чистые',p:false},
+    {t:'Мышки стоят на месте, чистые',p:false},
+    {t:'Клавиатуры в порядке',p:false},
+    {t:'Коврики сухие',p:false},
+    {t:'Мусорка поменяна',p:true},
+  ]},
+];
+
+// STATE
+let shiftType=null, state={}, taskState={}, rating=null, zonePhotos={};
+
+const CLOSING_ZONES=[
+  {id:'vhod',   icon:'🚪', label:'Вход'},
+  {id:'holod',  icon:'❄️',  label:'Холодильники'},
+  {id:'zal',    icon:'🖥️', label:'Общий зал'},
+  {id:'wc',     icon:'🚻', label:'Туалеты'},
+  {id:'vip',    icon:'👑', label:'ВИП зал'},
+  {id:'bar',    icon:'🍹', label:'Барная стойка'},
+];
+let zonePhotoKey=null;
+function key(sid,ii){return sid+'_'+ii}
+let photoKey=null;
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function goBack(){if(confirm('Выйти? Прогресс этой вкладки сохранится.'))showScreen('welcome')}
+function resetApp(){shiftType=null;state={};taskState={};rating=null;zonePhotos={};showScreen('welcome')}
+
+function startShift(type){
+  shiftType=type; state={}; taskState={}; rating=null;
+  const isDay=type==='day';
+  document.getElementById('h-title').textContent=isDay?'Дневная смена':'Ночная смена';
+  document.getElementById('h-sub').textContent=isDay?'Утренний обход · пр. Героев, 31':'Вечерний обход · пр. Героев, 31';
+  const b=document.getElementById('h-badge');
+  b.textContent=isDay?'ДЕНЬ':'НОЧЬ';
+  b.className='header-badge '+(isDay?'badge-day':'badge-night');
+  document.getElementById('prog-bar').className='progress-fill '+(isDay?'fill-day':'fill-night');
+  renderBody(); showScreen('checklist'); updateProgress();
+}
+
+function renderBody(){
+  const secs=shiftType==='day'?DAY:NIGHT;
+  const body=document.getElementById('scroll-body');
+  body.innerHTML='';
+  document.getElementById('sec-dots').innerHTML=secs.map((_,i)=>`<div class="sec-dot" id="dot-${i}"></div>`).join('');
+  secs.forEach(sec=>{
+    const block=document.createElement('div');
+    block.className='section-block';
+    block.id='blk-'+sec.id;
+    block.innerHTML=`
+      <div class="section-header">
+        <div class="section-icon ${sec.color}">${sec.icon}</div>
+        <div class="section-title-text">${sec.title}</div>
+        <div class="section-count" id="sc-${sec.id}">0/${sec.items.length}</div>
+      </div>
+      <div class="sec-prog"><div class="sec-prog-fill" id="sp-${sec.id}" style="width:0%"></div></div>
+      <div class="items-list" id="il-${sec.id}"></div>
+      <div class="section-divider"></div>
+    `;
+    body.appendChild(block);
+    const list=block.querySelector('#il-'+sec.id);
+    sec.items.forEach((item,ii)=>{
+      const k=key(sec.id,ii);
+      if(!state[k])state[k]={done:false,photos:[]};
+      list.appendChild(makeItem(sec.id,ii,item));
+    });
+  });
+  body.appendChild(makeTasksBlock());
+  body.appendChild(makeHandover());
+}
+
+function makeItem(sid,ii,item){
+  const k=key(sid,ii);
+  const s=state[k];
+  const el=document.createElement('div');
+  el.id='ci-'+k;
+
+  if(item.p){
+    // Фото-пункт: нажатие = открыть камеру
+    const hasPhoto=s.photos.length>0;
+    el.className='check-item photo-item'+(hasPhoto?' done':'');
+    el.onclick=()=>openPhoto(k);
+    const thumbs=hasPhoto?`<div class="photo-row">${s.photos.map((p,pi)=>
+      `<div class="photo-wrap"><img class="photo-thumb" src="${p}"><div class="photo-rm" onclick="event.stopPropagation();rmPhoto('${k}',${pi})">✕</div></div>`
+    ).join('')}</div>`:'';
+    el.innerHTML=`
+      <div class="cam-icon">${hasPhoto?'✅':'📷'}</div>
+      <div class="item-content">
+        <div class="item-text">${item.t}</div>
+        <div class="cam-hint">${hasPhoto?s.photos.length+' фото · нажми ещё раз чтобы добавить':'Нажми чтобы сфотографировать'}</div>
+        ${thumbs}
+      </div>`;
+  } else {
+    // Обычный чек-пункт: нажатие = галочка
+    el.className='check-item'+(s.done?' done':'');
+    el.onclick=()=>toggleItem(sid,ii);
+    el.innerHTML=`
+      <div class="checkmark">${s.done?'✓':''}</div>
+      <div class="item-content">
+        <div class="item-text">${item.t}</div>
+      </div>`;
+  }
+  return el;
+}
+
+function toggleItem(sid,ii){
+  const k=key(sid,ii);
+  state[k].done=!state[k].done;
+  const secs=shiftType==='day'?DAY:NIGHT;
+  const sec=secs.find(s=>s.id===sid);
+  const old=document.getElementById('ci-'+k);
+  old.replaceWith(makeItem(sid,ii,sec.items[ii]));
+  updateProgress();
+}
+
+function openPhoto(k){photoKey=k;document.getElementById('photo-input').click()}
+function handlePhoto(inp){
+  Array.from(inp.files).forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      state[photoKey].photos.push(e.target.result);
+      state[photoKey].done=true; // фото сделано = пункт выполнен
+      const [sid,iis]=photoKey.split('_');
+      const ii=parseInt(iis);
+      const secs=shiftType==='day'?DAY:NIGHT;
+      const sec=secs.find(s=>s.id===sid);
+      document.getElementById('ci-'+photoKey).replaceWith(makeItem(sid,ii,sec.items[ii]));
+      showToast('📷 Фото добавлено');
+      updateProgress();
+    };
+    r.readAsDataURL(f);
+  });
+  inp.value='';
+}
+function rmPhoto(k,pi){
+  state[k].photos.splice(pi,1);
+  if(state[k].photos.length===0) state[k].done=false; // убрал все фото = не выполнен
+  const [sid,iis]=k.split('_');
+  const ii=parseInt(iis);
+  const secs=shiftType==='day'?DAY:NIGHT;
+  const sec=secs.find(s=>s.id===sid);
+  document.getElementById('ci-'+k).replaceWith(makeItem(sid,ii,sec.items[ii]));
+  updateProgress();
+}
+
+function makeTasksBlock(){
+  const dow=new Date().getDay();
+  const dayName=DAYS[dow];
+  const today=WEEKLY[dow]||[];
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`
+    <div class="tasks-card">
+      <div class="tasks-hdr"><span>📋</span><span>ЗАДАЧИ НА СМЕНУ</span><div class="day-pill">${dayName}</div></div>
+      ${today.map((t,i)=>`
+        <div class="task-row" id="tr-${i}" onclick="toggleTask(${i})">
+          <div class="task-chk" id="tc-${i}"></div>
+          <div class="task-text">${t}</div>
+        </div>`).join('')}
+      ${!today.length?'<div style="padding:14px;font-size:13px;color:var(--text3);text-align:center">Нет задач на сегодня 🎉</div>':''}
+      <div style="padding:10px 14px;font-size:11px;color:var(--text3);border-top:1px solid rgba(255,255,255,0.04)">⚠️ Задачи необязательны — можно отправить отчёт даже если не все выполнены</div>
+    </div>`;
+  return wrap;
+}
+function toggleTask(i){
+  taskState[i]=!taskState[i];
+  const r=document.getElementById('tr-'+i);
+  const c=document.getElementById('tc-'+i);
+  if(taskState[i]){r.classList.add('done');c.textContent='✓';c.style.cssText='background:var(--green);border-color:var(--green);color:#fff;font-size:10px;font-weight:700'}
+  else{r.classList.remove('done');c.textContent='';c.style.cssText=''}
+}
+
+function makeHandover(){
+  const isDay=shiftType==='day';
+  const label=isDay?'ЗАКРЫТИЕ СМЕНЫ (21:00 – 22:00)':'ЗАКРЫТИЕ СМЕНЫ (09:00 – 10:00)';
+  const btnClass='submit-btn '+(isDay?'day':'night');
+
+  const zonesHTML=CLOSING_ZONES.map(z=>{
+    const photos=zonePhotos[z.id]||[];
+    const shot=photos.length>0;
+    return `<div class="zone-btn${shot?' shot':''}" onclick="openZonePhoto('${z.id}')">
+      ${shot?`<div class="zone-count">${photos.length}</div>`:''}
+      <span class="zone-icon">${z.icon}</span>
+      <div class="zone-label">${z.label}</div>
+      <div class="zone-hint">${shot?'✅ сфоткано · нажми ещё':'📷 нажми чтобы сфоткать'}</div>
+    </div>`;
+  }).join('');
+
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`
+    <div class="handover-card">
+      <div class="handover-hdr"><span>🔒</span><span>${label}</span></div>
+      <div style="padding:10px 14px 0;font-size:12px;color:var(--text2)">Сфотографируй каждую зону:</div>
+      <div class="zone-grid" id="zone-grid">${zonesHTML}</div>
+      <div class="handover-body">
+        <div>
+          <div class="fl">Кому передаю смену</div>
+          <input class="fi" id="h-next" type="text" placeholder="Имя следующего администратора">
+        </div>
+        <div>
+          <div class="fl">Сумма в кассе</div>
+          <div class="cash-row">
+            <input class="fi" id="h-cash" type="number" placeholder="0" inputmode="numeric">
+            <span class="cash-sym">₽</span>
+          </div>
+        </div>
+        <div>
+          <div class="fl">Оцени смену</div>
+          <div class="rating-grid">
+            <div class="rb" id="rb-good" onclick="setRating('good')"><span class="rb-emoji">😎</span>Отлично</div>
+            <div class="rb" id="rb-ok"   onclick="setRating('ok')"><span class="rb-emoji">😐</span>Нормально</div>
+            <div class="rb" id="rb-bad"  onclick="setRating('bad')"><span class="rb-emoji">😤</span>Тяжело</div>
+          </div>
+        </div>
+        <div>
+          <div class="fl">Заметки / инциденты / поломки</div>
+          <textarea class="fi" id="h-notes" rows="3" placeholder="Что важно знать следующей смене: поломки, конфликты, нехватка товара..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="submit-wrap">
+      <button class="${btnClass}" id="submit-btn" onclick="submitShift()">
+        <span>✅</span><span>Завершить и отправить отчёт</span><span class="sub-prog" id="sub-prog"></span>
+      </button>
+    </div>`;
+  return wrap;
+}
+
+function openZonePhoto(zoneId){
+  zonePhotoKey=zoneId;
+  document.getElementById('zone-photo-input').click();
+}
+
+function handleZonePhoto(inp){
+  Array.from(inp.files).forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      if(!zonePhotos[zonePhotoKey]) zonePhotos[zonePhotoKey]=[];
+      zonePhotos[zonePhotoKey].push(e.target.result);
+      refreshZoneGrid();
+      showToast('📷 Зона сфоткана');
+    };
+    r.readAsDataURL(f);
+  });
+  inp.value='';
+}
+
+function refreshZoneGrid(){
+  const grid=document.getElementById('zone-grid');
+  if(!grid) return;
+  grid.innerHTML=CLOSING_ZONES.map(z=>{
+    const photos=zonePhotos[z.id]||[];
+    const shot=photos.length>0;
+    return `<div class="zone-btn${shot?' shot':''}" onclick="openZonePhoto('${z.id}')">
+      ${shot?`<div class="zone-count">${photos.length}</div>`:''}
+      <span class="zone-icon">${z.icon}</span>
+      <div class="zone-label">${z.label}</div>
+      <div class="zone-hint">${shot?'✅ сфоткано · нажми ещё':'📷 нажми чтобы сфоткать'}</div>
+    </div>`;
+  }).join('');
+}
+function setRating(r){
+  rating=r;
+  ['good','ok','bad'].forEach(x=>{
+    const el=document.getElementById('rb-'+x);
+    if(el)el.className='rb'+(r===x?' '+x:'');
+  });
+}
+
+function updateProgress(){
+  const secs=shiftType==='day'?DAY:NIGHT;
+  let total=0,done=0;
+  secs.forEach((sec,si)=>{
+    let sd=0;
+    sec.items.forEach((_,ii)=>{if(state[key(sec.id,ii)]?.done){done++;sd++};total++});
+    const sp=document.getElementById('sp-'+sec.id);
+    const sc=document.getElementById('sc-'+sec.id);
+    if(sp)sp.style.width=(sec.items.length?sd/sec.items.length*100:0)+'%';
+    if(sc)sc.textContent=sd+'/'+sec.items.length;
+    const dot=document.getElementById('dot-'+si);
+    if(dot)dot.className='sec-dot'+(sd===sec.items.length?' done':sd>0?' partial':'');
+  });
+  const pct=total?done/total*100:0;
+  document.getElementById('prog-bar').style.width=pct+'%';
+  document.getElementById('prog-count').textContent=done+' / '+total;
+  const sp2=document.getElementById('sub-prog');
+  if(sp2) sp2.textContent = done < total ? `обход: ${done}/${total}` : '';
+}
+
+function base64ToBlob(base64){
+  const [header,data]=base64.split(',');
+  const mime=header.match(/:(.*?);/)[1];
+  const binary=atob(data);
+  const arr=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) arr[i]=binary.charCodeAt(i);
+  return new Blob([arr],{type:mime});
+}
+
+async function uploadPhotosToTelegram(secs){
+  const allPhotos=[];
+  // Фото из чеклиста
+  secs.forEach(sec=>{
+    sec.items.forEach((item,ii)=>{
+      const k=key(sec.id,ii);
+      if(state[k]?.photos?.length){
+        state[k].photos.forEach(photo=>allPhotos.push(photo));
+      }
+    });
+  });
+  // Фото зон закрытия
+  CLOSING_ZONES.forEach(z=>{
+    (zonePhotos[z.id]||[]).forEach(photo=>allPhotos.push(photo));
+  });
+  if(!allPhotos.length) return 0;
+
+  // Telegram sendMediaGroup: максимум 10 фото за раз
+  const chunks=[];
+  for(let i=0;i<allPhotos.length;i+=10) chunks.push(allPhotos.slice(i,i+10));
+
+  let sent=0;
+  for(const chunk of chunks){
+    try{
+      const fd=new FormData();
+      fd.append('chat_id', REPORT_CHAT_ID_JS);
+      const mediaArr=chunk.map((_,i)=>({type:'photo',media:`attach://photo${i}`}));
+      fd.append('media', JSON.stringify(mediaArr));
+      chunk.forEach((photo,i)=>fd.append(`photo${i}`, base64ToBlob(photo), `photo${i}.jpg`));
+      const res=await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup`,{method:'POST',body:fd});
+      if(res.ok) sent+=chunk.length;
+    }catch(e){ console.error('Album upload failed',e); }
+  }
+  return sent;
+}
+
+async function submitShift(){
+  const sb=document.getElementById('submit-btn');
+  sb.disabled=true;
+
+  const secs=shiftType==='day'?DAY:NIGHT;
+  const total=secs.reduce((a,s)=>a+s.items.length,0);
+  const done=Object.values(state).filter(s=>s.done).length;
+  const checklistPhotos=Object.values(state).reduce((a,s)=>a+s.photos.length,0);
+  const zonePhotosCount=Object.values(zonePhotos).reduce((a,p)=>a+p.length,0);
+  const photos=checklistPhotos+zonePhotosCount;
+  const now=new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const isDay=shiftType==='day';
+  const cash=document.getElementById('h-cash')?.value||'';
+  const next=document.getElementById('h-next')?.value||'';
+  const notes=document.getElementById('h-notes')?.value||'';
+  const ratingMap={good:'😎 Отлично',ok:'😐 Нормально',bad:'😤 Тяжело'};
+  const dow=new Date().getDay();
+  const todayTasks=WEEKLY[dow]||[];
+  const doneTasks=Object.values(taskState).filter(Boolean).length;
+  const totalTasks=todayTasks.length;
+  const incompleteTasks=todayTasks.filter((_,i)=>!taskState[i]);
+
+  const unchecked={};
+  secs.forEach(sec=>{
+    const missed=sec.items.filter((_,ii)=>!state[key(sec.id,ii)]?.done).map(i=>i.t);
+    if(missed.length) unchecked[sec.title]=missed;
+  });
+
+  const payload={
+    shift:shiftType, datetime:now,
+    checklist:{done,total},
+    tasks:{done:doneTasks,total:totalTasks,incomplete:incompleteTasks},
+    handover:{next,cash,rating,notes},
+    unchecked, photos_total:photos,
+  };
+
+  // Сначала загружаем фото
+  if(photos>0){
+    sb.innerHTML=`<span>📸</span><span>Отправляем фото...</span>`;
+    await uploadPhotosToTelegram(secs);
+  }
+
+  sb.innerHTML='<span>⏳</span><span>Отправляем отчёт...</span>';
+
+  document.getElementById('done-title').textContent=isDay?'✅ Дневная смена сдана!':'✅ Ночная смена сдана!';
+  document.getElementById('done-sub').textContent='Отчёт отправлен управляющему. '+(isDay?'Хорошего вечера! 🌆':'Хорошего отдыха! 😴');
+  document.getElementById('done-stats').innerHTML=`
+    <div class="stat-row"><span class="stat-label">Дата и время</span><span class="stat-val">${now}</span></div>
+    <div class="stat-row"><span class="stat-label">Смена</span><span class="stat-val">${isDay?'Дневная 🌅':'Ночная 🌙'}</span></div>
+    <div class="stat-row"><span class="stat-label">Обход</span><span class="stat-val" style="color:var(--green)">✅ ${done} / ${total}</span></div>
+    <div class="stat-row"><span class="stat-label">Задачи</span><span class="stat-val" style="color:${doneTasks===totalTasks?'var(--green)':'var(--amber)'}">${doneTasks} / ${totalTasks}${doneTasks<totalTasks?' ⚠️':' ✅'}</span></div>
+    ${incompleteTasks.length?`<div class="stat-row"><span class="stat-label" style="color:var(--amber)">Не выполнено</span><span class="stat-val" style="font-size:12px;color:var(--amber)">${incompleteTasks.join(', ')}</span></div>`:''}
+    <div class="stat-row"><span class="stat-label">Фото отправлено</span><span class="stat-val">${photos}</span></div>
+    <div class="stat-row"><span class="stat-label">Касса</span><span class="stat-val">${cash||'—'} ₽</span></div>
+    <div class="stat-row"><span class="stat-label">Принимает смену</span><span class="stat-val">${next||'—'}</span></div>
+    <div class="stat-row"><span class="stat-label">Оценка смены</span><span class="stat-val">${rating?ratingMap[rating]:'—'}</span></div>
+    ${notes?`<div class="stat-row"><span class="stat-label">Заметки</span><span class="stat-val">${notes}</span></div>`:''}
+  `;
+
+  showScreen('done');
+  if(tg) tg.sendData(JSON.stringify(payload));
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Cyber Space — Смены v2</title>
+<title>Cyber Space — Смены v3</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +16,7 @@
   --text:#f0f0ff;--text2:#8888aa;--text3:#555577;
   --border:rgba(124,58,237,0.2);--border2:rgba(6,182,212,0.15);
   --glow-p:0 0 20px rgba(124,58,237,0.3);--glow-c:0 0 20px rgba(6,182,212,0.3);
-  --r:12px;
+  --r:12px;--tab-h:62px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{min-height:100vh;overflow-x:hidden}
@@ -55,6 +55,23 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .badge-day{background:rgba(124,58,237,0.2);color:var(--purple2);border:1px solid rgba(124,58,237,0.3)}
 .badge-night{background:rgba(6,182,212,0.15);color:var(--cyan);border:1px solid rgba(6,182,212,0.25)}
 
+/* TAB BAR */
+.tab-bar{position:fixed;bottom:0;left:0;right:0;height:var(--tab-h);background:var(--bg2);border-top:1px solid var(--border);display:flex;z-index:200}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:all 0.2s;user-select:none;position:relative;padding:6px 4px}
+.tab-item:active{background:rgba(255,255,255,0.04)}
+.tab-icon{font-size:20px;line-height:1}
+.tab-label{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.3px;color:var(--text3);transition:color 0.2s}
+.tab-item.active .tab-label{color:var(--purple2)}
+.tab-item.active-night .tab-label{color:var(--cyan)}
+.tab-indicator{position:absolute;top:0;left:50%;transform:translateX(-50%);width:30px;height:2px;border-radius:0 0 2px 2px;background:var(--purple);opacity:0;transition:opacity 0.2s}
+.tab-item.active .tab-indicator{opacity:1}
+.tab-item.active-night .tab-indicator{background:var(--cyan);opacity:1}
+.tab-badge{position:absolute;top:5px;right:calc(50% - 18px);background:var(--green);color:#fff;font-size:9px;font-weight:700;border-radius:8px;padding:1px 5px;min-width:16px;text-align:center}
+
+/* TAB CONTENT */
+.tab-pane{display:none;padding-bottom:calc(var(--tab-h) + 16px)}
+.tab-pane.active{display:block}
+
 /* PROGRESS */
 .progress-wrap{padding:12px 16px;background:var(--bg2);border-bottom:1px solid rgba(255,255,255,0.04)}
 .progress-header{display:flex;justify-content:space-between;margin-bottom:8px}
@@ -90,18 +107,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .check-item.done .checkmark{background:var(--green);border-color:var(--green);color:#fff}
 .item-content{flex:1;min-width:0}
 .item-text{font-size:13.5px;line-height:1.5;color:var(--text)}
-.photo-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--cyan);background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);border-radius:4px;padding:2px 7px;margin-top:5px;cursor:pointer;user-select:none}
-.photo-badge.has{color:var(--green);background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.25)}
-.photo-item{border-left:3px solid var(--cyan)}
-.photo-item.done{border-left-color:var(--green);background:rgba(16,185,129,0.04)}
-.photo-item.done .item-text{color:var(--text3)}
-.cam-icon{font-size:22px;flex-shrink:0;margin-top:1px;width:28px;text-align:center}
-.cam-hint{font-size:11px;color:var(--cyan);margin-top:3px}
-.photo-item.done .cam-hint{color:var(--green)}
-.photo-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.photo-wrap{position:relative;display:inline-block}
-.photo-thumb{width:56px;height:56px;border-radius:7px;object-fit:cover;border:1px solid rgba(255,255,255,0.1);display:block}
-.photo-rm{position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(239,68,68,0.9);display:flex;align-items:center;justify-content:center;font-size:9px;cursor:pointer;color:#fff;font-weight:700}
 .section-divider{height:8px;background:var(--bg);border-top:1px solid rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.03)}
 
 /* TASKS */
@@ -115,6 +120,17 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .task-chk{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--text3);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-size:10px;font-weight:700}
 .task-row.done .task-chk{background:var(--green);border-color:var(--green);color:#fff}
 .task-text{font-size:13px;line-height:1.5;color:var(--text)}
+
+/* ZONE PHOTO BUTTONS */
+.zone-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
+.zone-btn{background:var(--card2);border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:18px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all 0.2s;user-select:none;position:relative}
+.zone-btn:active{transform:scale(0.96)}
+.zone-btn.shot{background:rgba(16,185,129,0.12);border-color:var(--green)}
+.zone-btn .zone-icon{font-size:32px}
+.zone-btn .zone-label{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.3px;color:var(--text);text-align:center}
+.zone-btn .zone-hint{font-size:10px;color:var(--cyan);text-align:center}
+.zone-btn.shot .zone-hint{color:var(--green)}
+.zone-btn .zone-count{position:absolute;top:8px;right:8px;background:var(--green);color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:2px 6px}
 
 /* HANDOVER */
 .handover-card{margin:12px 16px;background:var(--card);border-radius:var(--r);border:1px solid var(--border2);overflow:hidden}
@@ -135,25 +151,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .rb.bad{background:rgba(239,68,68,0.15);border-color:var(--red);color:var(--red)}
 
 /* SUBMIT */
-.submit-wrap{padding:16px 16px 32px}
+.submit-wrap{padding:16px 16px 8px}
 .submit-btn{width:100%;padding:15px;border:none;border-radius:var(--r);font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:0.5px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
 .submit-btn.day{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;box-shadow:0 4px 20px rgba(124,58,237,0.35)}
 .submit-btn.night{background:linear-gradient(135deg,#0e7490,var(--cyan));color:#000;box-shadow:0 4px 20px rgba(6,182,212,0.25)}
-.submit-btn:disabled{opacity:0.4;cursor:not-allowed;box-shadow:none}
 .submit-btn:active:not(:disabled){transform:scale(0.98)}
 .sub-prog{font-size:12px;opacity:0.7}
-.scroll-body{padding-bottom:24px}
-
-/* ZONE PHOTO BUTTONS */
-.zone-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
-.zone-btn{background:var(--card2);border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:18px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all 0.2s;user-select:none;position:relative}
-.zone-btn:active{transform:scale(0.96)}
-.zone-btn.shot{background:rgba(16,185,129,0.12);border-color:var(--green)}
-.zone-btn .zone-icon{font-size:32px}
-.zone-btn .zone-label{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.3px;color:var(--text);text-align:center}
-.zone-btn .zone-hint{font-size:10px;color:var(--cyan);text-align:center}
-.zone-btn.shot .zone-hint{color:var(--green)}
-.zone-btn .zone-count{position:absolute;top:8px;right:8px;background:var(--green);color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:2px 6px}
 
 /* DONE */
 .done-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;background:radial-gradient(ellipse at 50% 30%,rgba(16,185,129,0.12) 0%,transparent 60%),var(--bg)}
@@ -200,350 +203,45 @@ input[type=file]{display:none}
   </div>
 </div>
 
-<!-- CHECKLIST -->
-<div class="screen" id="screen-checklist">
+<!-- MAIN APP -->
+<div class="screen" id="screen-main">
   <div class="app-header">
     <div class="back-btn" onclick="goBack()">←</div>
     <div class="header-logo">CS</div>
     <div class="header-info">
       <h1 id="h-title">Дневная смена</h1>
-      <p id="h-sub">Утренний обход · пр. Героев, 31</p>
+      <p id="h-sub">пр. Героев, 31</p>
     </div>
     <div class="header-badge badge-day" id="h-badge">ДЕНЬ</div>
   </div>
-  <div class="progress-wrap">
-    <div class="progress-header">
-      <span class="progress-label">Прогресс</span>
-      <span class="progress-count" id="prog-count">0 / 0</span>
-    </div>
-    <div class="progress-track"><div class="progress-fill fill-day" id="prog-bar" style="width:0%"></div></div>
-    <div class="sec-dots" id="sec-dots"></div>
-  </div>
-  <div class="scroll-body" id="scroll-body"></div>
-</div>
 
-<!-- DONE -->
-<div class="screen" id="screen-done">
-  <div class="done-screen">
-    <div class="done-icon">🎉</div>
-    <div class="done-title" id="done-title">Смена завершена!</div>
-    <div class="done-sub" id="done-sub">Отчёт отправлен управляющему.</div>
-    <div class="done-stats" id="done-stats"></div>
-    <button class="restart-btn" onclick="resetApp()">← Начать новую смену</button>
-  </div>
-</div>
-
-<input type="file" id="photo-input" accept="image/*" capture="environment" onchange="handlePhoto(this)">
-<input type="file" id="zone-photo-input" accept="image/*" capture="environment" onchange="handleZonePhoto(this)">
-
-<script>
-// Инициализация Telegram WebApp
-const tg = window.Telegram?.WebApp;
-if (tg) {
-  tg.ready();
-  tg.expand();
-}
-
-// ⚠️ Репозиторий должен быть ПРИВАТНЫМ — токен не для публичного доступа
-const BOT_TOKEN = '8714962236:AAHQ0gH2QczdzZf4RDmEhei6AjOYRkFnYtc';
-const REPORT_CHAT_ID_JS = '-1003820148218';
-
-const DAYS = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
-const WEEKLY = {
-  0:['Генеральная проверка всех зон','Инвентаризация — составить список закупок'],
-  1:['Помыть клавиатуры во всех зонах','Протереть корпуса ПК от пыли'],
-  2:['Протереть мониторы с двух сторон','Проверить и заменить мундштуки'],
-  3:['Помыть под столами и стульями','Протереть подлокотники и основания кресел'],
-  4:['Слить и промыть кулер','Протереть витрину и полки с товаром'],
-  5:['Глубокая чистка барной стойки — все три уровня','Промыть все кальяны с мыльной водой'],
-  6:['Протереть всю периферию: мышки, наушники','Протереть входную дверь и стёкла'],
-};
-
-const DAY = [
-  {id:'entrance',icon:'🚪',color:'si-purple',title:'ВХОД',items:[
-    {t:'Все напитки / снеки / чипсы выставлены',p:false},
-    {t:'Холодильник чистый, нет разводов, окна не запотевшие',p:true},
-    {t:'Телевизор работает (выведены ценники)',p:false},
-    {t:'Микроволновка чистая внутри (нет крошек, тарелка чистая) и снаружи (нет пыли и грязи)',p:false},
-    {t:'Стойка чистая — нет сахара, остатков еды, липких разводов',p:false},
-    {t:'Чай / сахар / вода в кулере есть',p:false},
-    {t:'Слив кулера пустой, на крышке нет пыли',p:false},
-    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:true},
-  ]},
-  {id:'bar',icon:'💨',color:'si-amber',title:'ХОЛОДИЛЬНИКИ',items:[
-    {t:'Вытяжка выключена',p:false},
-    {t:'Барная стойка чистая — все три уровня: нет крошек, следов еды, липких разводов',p:false},
-    {t:'У угля ничего не стоит (кроме самого угля)',p:false},
-    {t:'Под углём ничего не лежит',p:false},
-    {t:'Электропечь чистая — нет пепла, сажи, разводов; рядом тоже чисто',p:true},
-    {t:'Кадило пустое — нет остатков табака, углей, пепла',p:false},
-    {t:'Кальяны собраны и чистые',p:true},
-    {t:'Раковина чистая внутри — ничего не лежит, нет грязи и остатков табака; рядом тоже порядок',p:true},
-    {t:'Под раковиной нет мусора, остатков табака, пол чистый',p:false},
-    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:true},
-  ]},
-  {id:'hall',icon:'🖥️',color:'si-cyan',title:'ОБЩИЙ ЗАЛ',items:[
-    {t:'Стулья стоят ровно — максимально подняты, ручки опущены, у каждого есть подушка',p:false},
-    {t:'Столы чистые — нет крошек, следов еды, липких разводов',p:false},
-    {t:'Под столами на стенке нет следов грязи и разводов',p:false},
-    {t:'Мышки стоят на месте, чистые — нет грязи и жирных отпечатков',p:false},
-    {t:'Клавиатуры: все клавиши на месте, нет жирных разводов, не залиты',p:false},
-    {t:'Мониторы подняты и стоят ±на одном уровне',p:false},
-    {t:'Коврики сухие, нет крошек и остатков еды',p:false},
-  ]},
-  {id:'wc',icon:'🚻',color:'si-green',title:'ТУАЛЕТЫ',items:[
-    {t:'Мыло есть',p:false},
-    {t:'Туалетная бумага есть',p:false},
-    {t:'Бумажные полотенца есть',p:false},
-    {t:'На зеркале нет разводов',p:false},
-    {t:'Раковина чистая',p:false},
-    {t:'Туалет чистый — нет коричневой полосы у слива',p:false},
-    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:true},
-  ]},
-  {id:'vip',icon:'👑',color:'si-purple',title:'ВИП ЗАЛ',items:[
-    {t:'Стулья стоят ровно — максимально подняты, ручки опущены, у каждого есть подушка',p:false},
-    {t:'Столы чистые — нет крошек, следов еды, липких разводов',p:false},
-    {t:'Под столами на стенке нет следов грязи и разводов',p:false},
-    {t:'Мышки стоят на месте, чистые',p:false},
-    {t:'Клавиатуры: все клавиши на месте, не залиты',p:false},
-    {t:'Мониторы подняты и стоят ±на одном уровне',p:false},
-    {t:'Коврики сухие, нет крошек и остатков еды',p:false},
-    {t:'Кондиционер выключен',p:false},
-    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:true},
-  ]},
-];
-
-const NIGHT = [
-  {id:'entrance',icon:'🚪',color:'si-cyan',title:'ВХОД',items:[
-    {t:'Все напитки / снеки / чипсы выставлены',p:false},
-    {t:'Холодильник чистый, нет разводов, окна не запотевшие',p:true},
-    {t:'Телевизор работает (выведены ценники)',p:false},
-    {t:'Стойка чистая — нет сахара, остатков еды, липких разводов',p:false},
-    {t:'Чай / сахар / вода в кулере есть',p:false},
-    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:true},
-  ]},
-  {id:'bar',icon:'💨',color:'si-amber',title:'ХОЛОДИЛЬНИКИ',items:[
-    {t:'Вытяжка в рабочем состоянии',p:false},
-    {t:'Барная стойка чистая — все три уровня',p:false},
-    {t:'Электропечь чистая — нет пепла, сажи, разводов; рядом тоже чисто',p:true},
-    {t:'Кадило пустое — нет остатков табака, углей, пепла',p:false},
-    {t:'Кальяны собраны и чистые',p:true},
-    {t:'Раковина чистая, рядом порядок',p:true},
-    {t:'Мусорка поменяна',p:true},
-  ]},
-  {id:'hall',icon:'🖥️',color:'si-purple',title:'ОБЩИЙ ЗАЛ',items:[
-    {t:'Стулья стоят ровно, у каждого есть подушка',p:false},
-    {t:'Столы чистые — нет крошек, следов еды, разводов',p:false},
-    {t:'Мышки стоят на месте, чистые',p:false},
-    {t:'Клавиатуры в порядке — не залиты',p:false},
-    {t:'Коврики сухие, нет крошек',p:false},
-  ]},
-  {id:'wc',icon:'🚻',color:'si-green',title:'ТУАЛЕТЫ',items:[
-    {t:'Мыло есть',p:false},
-    {t:'Туалетная бумага есть',p:false},
-    {t:'Бумажные полотенца есть',p:false},
-    {t:'Раковина чистая',p:false},
-    {t:'Туалет чистый',p:false},
-    {t:'Мусорка поменяна',p:true},
-  ]},
-  {id:'vip',icon:'👑',color:'si-cyan',title:'ВИП ЗАЛ',items:[
-    {t:'Стулья стоят ровно, у каждого есть подушка',p:false},
-    {t:'Столы чистые',p:false},
-    {t:'Мышки стоят на месте, чистые',p:false},
-    {t:'Клавиатуры в порядке',p:false},
-    {t:'Коврики сухие',p:false},
-    {t:'Мусорка поменяна',p:true},
-  ]},
-];
-
-// STATE
-let shiftType=null, state={}, taskState={}, rating=null, zonePhotos={};
-
-const CLOSING_ZONES=[
-  {id:'vhod',   icon:'🚪', label:'Вход'},
-  {id:'holod',  icon:'❄️',  label:'Холодильники'},
-  {id:'zal',    icon:'🖥️', label:'Общий зал'},
-  {id:'wc',     icon:'🚻', label:'Туалеты'},
-  {id:'vip',    icon:'👑', label:'ВИП зал'},
-  {id:'bar',    icon:'🍹', label:'Барная стойка'},
-];
-let zonePhotoKey=null;
-function key(sid,ii){return sid+'_'+ii}
-let photoKey=null;
-
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-'+id).classList.add('active');
-  window.scrollTo(0,0);
-}
-function goBack(){if(confirm('Выйти? Прогресс этой вкладки сохранится.'))showScreen('welcome')}
-function resetApp(){shiftType=null;state={};taskState={};rating=null;zonePhotos={};showScreen('welcome')}
-
-function startShift(type){
-  shiftType=type; state={}; taskState={}; rating=null;
-  const isDay=type==='day';
-  document.getElementById('h-title').textContent=isDay?'Дневная смена':'Ночная смена';
-  document.getElementById('h-sub').textContent=isDay?'Утренний обход · пр. Героев, 31':'Вечерний обход · пр. Героев, 31';
-  const b=document.getElementById('h-badge');
-  b.textContent=isDay?'ДЕНЬ':'НОЧЬ';
-  b.className='header-badge '+(isDay?'badge-day':'badge-night');
-  document.getElementById('prog-bar').className='progress-fill '+(isDay?'fill-day':'fill-night');
-  renderBody(); showScreen('checklist'); updateProgress();
-}
-
-function renderBody(){
-  const secs=shiftType==='day'?DAY:NIGHT;
-  const body=document.getElementById('scroll-body');
-  body.innerHTML='';
-  document.getElementById('sec-dots').innerHTML=secs.map((_,i)=>`<div class="sec-dot" id="dot-${i}"></div>`).join('');
-  secs.forEach(sec=>{
-    const block=document.createElement('div');
-    block.className='section-block';
-    block.id='blk-'+sec.id;
-    block.innerHTML=`
-      <div class="section-header">
-        <div class="section-icon ${sec.color}">${sec.icon}</div>
-        <div class="section-title-text">${sec.title}</div>
-        <div class="section-count" id="sc-${sec.id}">0/${sec.items.length}</div>
+  <!-- TAB 1: ПРИНЯТИЕ СМЕНЫ -->
+  <div class="tab-pane active" id="pane-0">
+    <div class="progress-wrap">
+      <div class="progress-header">
+        <span class="progress-label">Принятие смены</span>
+        <span class="progress-count" id="prog-count-0">0 / 0</span>
       </div>
-      <div class="sec-prog"><div class="sec-prog-fill" id="sp-${sec.id}" style="width:0%"></div></div>
-      <div class="items-list" id="il-${sec.id}"></div>
-      <div class="section-divider"></div>
-    `;
-    body.appendChild(block);
-    const list=block.querySelector('#il-'+sec.id);
-    sec.items.forEach((item,ii)=>{
-      const k=key(sec.id,ii);
-      if(!state[k])state[k]={done:false,photos:[]};
-      list.appendChild(makeItem(sec.id,ii,item));
-    });
-  });
-  body.appendChild(makeTasksBlock());
-  body.appendChild(makeHandover());
-}
+      <div class="progress-track"><div class="progress-fill fill-day" id="prog-bar-0" style="width:0%"></div></div>
+      <div class="sec-dots" id="sec-dots-0"></div>
+    </div>
+    <div id="checklist-body"></div>
+  </div>
 
-function makeItem(sid,ii,item){
-  const k=key(sid,ii);
-  const s=state[k];
-  const el=document.createElement('div');
-  el.id='ci-'+k;
+  <!-- TAB 2: ЗАДАЧИ -->
+  <div class="tab-pane" id="pane-1">
+    <div id="tasks-body" style="padding:12px 0 0"></div>
+  </div>
 
-  if(item.p){
-    // Фото-пункт: нажатие = открыть камеру
-    const hasPhoto=s.photos.length>0;
-    el.className='check-item photo-item'+(hasPhoto?' done':'');
-    el.onclick=()=>openPhoto(k);
-    const thumbs=hasPhoto?`<div class="photo-row">${s.photos.map((p,pi)=>
-      `<div class="photo-wrap"><img class="photo-thumb" src="${p}"><div class="photo-rm" onclick="event.stopPropagation();rmPhoto('${k}',${pi})">✕</div></div>`
-    ).join('')}</div>`:'';
-    el.innerHTML=`
-      <div class="cam-icon">${hasPhoto?'✅':'📷'}</div>
-      <div class="item-content">
-        <div class="item-text">${item.t}</div>
-        <div class="cam-hint">${hasPhoto?s.photos.length+' фото · нажми ещё раз чтобы добавить':'Нажми чтобы сфотографировать'}</div>
-        ${thumbs}
-      </div>`;
-  } else {
-    // Обычный чек-пункт: нажатие = галочка
-    el.className='check-item'+(s.done?' done':'');
-    el.onclick=()=>toggleItem(sid,ii);
-    el.innerHTML=`
-      <div class="checkmark">${s.done?'✓':''}</div>
-      <div class="item-content">
-        <div class="item-text">${item.t}</div>
-      </div>`;
-  }
-  return el;
-}
-
-function toggleItem(sid,ii){
-  const k=key(sid,ii);
-  state[k].done=!state[k].done;
-  const secs=shiftType==='day'?DAY:NIGHT;
-  const sec=secs.find(s=>s.id===sid);
-  const old=document.getElementById('ci-'+k);
-  old.replaceWith(makeItem(sid,ii,sec.items[ii]));
-  updateProgress();
-}
-
-function openPhoto(k){photoKey=k;document.getElementById('photo-input').click()}
-function handlePhoto(inp){
-  Array.from(inp.files).forEach(f=>{
-    const r=new FileReader();
-    r.onload=e=>{
-      state[photoKey].photos.push(e.target.result);
-      state[photoKey].done=true; // фото сделано = пункт выполнен
-      const [sid,iis]=photoKey.split('_');
-      const ii=parseInt(iis);
-      const secs=shiftType==='day'?DAY:NIGHT;
-      const sec=secs.find(s=>s.id===sid);
-      document.getElementById('ci-'+photoKey).replaceWith(makeItem(sid,ii,sec.items[ii]));
-      showToast('📷 Фото добавлено');
-      updateProgress();
-    };
-    r.readAsDataURL(f);
-  });
-  inp.value='';
-}
-function rmPhoto(k,pi){
-  state[k].photos.splice(pi,1);
-  if(state[k].photos.length===0) state[k].done=false; // убрал все фото = не выполнен
-  const [sid,iis]=k.split('_');
-  const ii=parseInt(iis);
-  const secs=shiftType==='day'?DAY:NIGHT;
-  const sec=secs.find(s=>s.id===sid);
-  document.getElementById('ci-'+k).replaceWith(makeItem(sid,ii,sec.items[ii]));
-  updateProgress();
-}
-
-function makeTasksBlock(){
-  const dow=new Date().getDay();
-  const dayName=DAYS[dow];
-  const today=WEEKLY[dow]||[];
-  const wrap=document.createElement('div');
-  wrap.innerHTML=`
-    <div class="tasks-card">
-      <div class="tasks-hdr"><span>📋</span><span>ЗАДАЧИ НА СМЕНУ</span><div class="day-pill">${dayName}</div></div>
-      ${today.map((t,i)=>`
-        <div class="task-row" id="tr-${i}" onclick="toggleTask(${i})">
-          <div class="task-chk" id="tc-${i}"></div>
-          <div class="task-text">${t}</div>
-        </div>`).join('')}
-      ${!today.length?'<div style="padding:14px;font-size:13px;color:var(--text3);text-align:center">Нет задач на сегодня 🎉</div>':''}
-      <div style="padding:10px 14px;font-size:11px;color:var(--text3);border-top:1px solid rgba(255,255,255,0.04)">⚠️ Задачи необязательны — можно отправить отчёт даже если не все выполнены</div>
-    </div>`;
-  return wrap;
-}
-function toggleTask(i){
-  taskState[i]=!taskState[i];
-  const r=document.getElementById('tr-'+i);
-  const c=document.getElementById('tc-'+i);
-  if(taskState[i]){r.classList.add('done');c.textContent='✓';c.style.cssText='background:var(--green);border-color:var(--green);color:#fff;font-size:10px;font-weight:700'}
-  else{r.classList.remove('done');c.textContent='';c.style.cssText=''}
-}
-
-function makeHandover(){
-  const isDay=shiftType==='day';
-  const label=isDay?'ЗАКРЫТИЕ СМЕНЫ (21:00 – 22:00)':'ЗАКРЫТИЕ СМЕНЫ (09:00 – 10:00)';
-  const btnClass='submit-btn '+(isDay?'day':'night');
-
-  const zonesHTML=CLOSING_ZONES.map(z=>{
-    const photos=zonePhotos[z.id]||[];
-    const shot=photos.length>0;
-    return `<div class="zone-btn${shot?' shot':''}" onclick="openZonePhoto('${z.id}')">
-      ${shot?`<div class="zone-count">${photos.length}</div>`:''}
-      <span class="zone-icon">${z.icon}</span>
-      <div class="zone-label">${z.label}</div>
-      <div class="zone-hint">${shot?'✅ сфоткано · нажми ещё':'📷 нажми чтобы сфоткать'}</div>
-    </div>`;
-  }).join('');
-
-  const wrap=document.createElement('div');
-  wrap.innerHTML=`
+  <!-- TAB 3: ЗАКРЫТИЕ СМЕНЫ -->
+  <div class="tab-pane" id="pane-2">
+    <div style="padding:14px 16px 6px">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--cyan);margin-bottom:4px">📷 ЗАКРЫТИЕ СМЕНЫ</div>
+      <div style="font-size:12px;color:var(--text2)">Сфотографируй каждую зону перед закрытием</div>
+    </div>
+    <div class="zone-grid" id="zone-grid"></div>
     <div class="handover-card">
-      <div class="handover-hdr"><span>🔒</span><span>${label}</span></div>
-      <div style="padding:10px 14px 0;font-size:12px;color:var(--text2)">Сфотографируй каждую зону:</div>
-      <div class="zone-grid" id="zone-grid">${zonesHTML}</div>
+      <div class="handover-hdr"><span>📋</span><span>ПЕРЕДАЧА СМЕНЫ</span></div>
       <div class="handover-body">
         <div>
           <div class="fl">Кому передаю смену</div>
@@ -571,38 +269,350 @@ function makeHandover(){
       </div>
     </div>
     <div class="submit-wrap">
-      <button class="${btnClass}" id="submit-btn" onclick="submitShift()">
+      <button class="submit-btn day" id="submit-btn" onclick="submitShift()">
         <span>✅</span><span>Завершить и отправить отчёт</span><span class="sub-prog" id="sub-prog"></span>
       </button>
-    </div>`;
-  return wrap;
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <div class="tab-item active" id="tab-0" onclick="switchTab(0)">
+      <div class="tab-indicator"></div>
+      <span class="tab-icon">✅</span>
+      <span class="tab-label">Принятие</span>
+    </div>
+    <div class="tab-item" id="tab-1" onclick="switchTab(1)">
+      <div class="tab-indicator"></div>
+      <span class="tab-icon">📋</span>
+      <span class="tab-label">Задачи</span>
+    </div>
+    <div class="tab-item" id="tab-2" onclick="switchTab(2)">
+      <div class="tab-indicator"></div>
+      <span class="tab-icon">🔒</span>
+      <span class="tab-label">Закрытие</span>
+    </div>
+  </div>
+</div>
+
+<!-- DONE -->
+<div class="screen" id="screen-done">
+  <div class="done-screen">
+    <div class="done-icon">🎉</div>
+    <div class="done-title" id="done-title">Смена завершена!</div>
+    <div class="done-sub" id="done-sub">Отчёт отправлен управляющему.</div>
+    <div class="done-stats" id="done-stats"></div>
+    <button class="restart-btn" onclick="resetApp()">← Начать новую смену</button>
+  </div>
+</div>
+
+<input type="file" id="zone-photo-input" accept="image/*" capture="environment" onchange="handleZonePhoto(this)">
+
+<script>
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+const BOT_TOKEN = '8714962236:AAHQ0gH2QczdzZf4RDmEhei6AjOYRkFnYtc';
+const REPORT_CHAT_ID_JS = '-1003820148218';
+
+const DAYS = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+const WEEKLY = {
+  0:['Генеральная проверка всех зон','Инвентаризация — составить список закупок'],
+  1:['Помыть клавиатуры во всех зонах','Протереть корпуса ПК от пыли'],
+  2:['Протереть мониторы с двух сторон','Проверить и заменить мундштуки'],
+  3:['Помыть под столами и стульями','Протереть подлокотники и основания кресел'],
+  4:['Слить и промыть кулер','Протереть витрину и полки с товаром'],
+  5:['Глубокая чистка барной стойки — все три уровня','Промыть все кальяны с мыльной водой'],
+  6:['Протереть всю периферию: мышки, наушники','Протереть входную дверь и стёкла'],
+};
+
+// Чеклист принятия смены (только галочки, без фото)
+const DAY_SECTIONS = [
+  {id:'entrance',icon:'🚪',color:'si-purple',title:'ВХОД',items:[
+    'Все напитки / снеки / чипсы выставлены',
+    'Холодильник чистый, нет разводов, окна не запотевшие',
+    'Телевизор работает (выведены ценники)',
+    'Микроволновка чистая внутри (нет крошек, тарелка чистая) и снаружи',
+    'Стойка чистая — нет сахара, остатков еды, липких разводов',
+    'Чай / сахар / вода в кулере есть',
+    'Слив кулера пустой, на крышке нет пыли',
+    'Мусорка поменяна, за мусоркой нет бутылок и грязи',
+  ]},
+  {id:'bar',icon:'💨',color:'si-amber',title:'ХОЛОДИЛЬНИКИ',items:[
+    'Вытяжка выключена',
+    'Барная стойка чистая — все три уровня: нет крошек, следов еды, липких разводов',
+    'У угля ничего не стоит (кроме самого угля)',
+    'Под углём ничего не лежит',
+    'Электропечь чистая — нет пепла, сажи, разводов; рядом тоже чисто',
+    'Кадило пустое — нет остатков табака, углей, пепла',
+    'Кальяны собраны и чистые',
+    'Раковина чистая внутри — ничего не лежит, нет грязи и остатков табака; рядом тоже порядок',
+    'Под раковиной нет мусора, остатков табака, пол чистый',
+    'Мусорка поменяна, за мусоркой нет бутылок и грязи',
+  ]},
+  {id:'hall',icon:'🖥️',color:'si-cyan',title:'ОБЩИЙ ЗАЛ',items:[
+    'Стулья стоят ровно — максимально подняты, ручки опущены, у каждого есть подушка',
+    'Столы чистые — нет крошек, следов еды, липких разводов',
+    'Под столами на стенке нет следов грязи и разводов',
+    'Мышки стоят на месте, чистые — нет грязи и жирных отпечатков',
+    'Клавиатуры: все клавиши на месте, нет жирных разводов, не залиты',
+    'Мониторы подняты и стоят ±на одном уровне',
+    'Коврики сухие, нет крошек и остатков еды',
+  ]},
+  {id:'wc',icon:'🚻',color:'si-green',title:'ТУАЛЕТЫ',items:[
+    'Мыло есть',
+    'Туалетная бумага есть',
+    'Бумажные полотенца есть',
+    'На зеркале нет разводов',
+    'Раковина чистая',
+    'Туалет чистый — нет коричневой полосы у слива',
+    'Мусорка поменяна, за мусоркой нет бутылок и грязи',
+  ]},
+  {id:'vip',icon:'👑',color:'si-purple',title:'ВИП ЗАЛ',items:[
+    'Стулья стоят ровно — максимально подняты, ручки опущены, у каждого есть подушка',
+    'Столы чистые — нет крошек, следов еды, липких разводов',
+    'Под столами на стенке нет следов грязи и разводов',
+    'Мышки стоят на месте, чистые',
+    'Клавиатуры: все клавиши на месте, не залиты',
+    'Мониторы подняты и стоят ±на одном уровне',
+    'Коврики сухие, нет крошек и остатков еды',
+    'Кондиционер выключен',
+    'Мусорка поменяна, за мусоркой нет бутылок и грязи',
+  ]},
+];
+
+const NIGHT_SECTIONS = [
+  {id:'entrance',icon:'🚪',color:'si-cyan',title:'ВХОД',items:[
+    'Все напитки / снеки / чипсы выставлены',
+    'Холодильник чистый, нет разводов, окна не запотевшие',
+    'Телевизор работает (выведены ценники)',
+    'Стойка чистая — нет сахара, остатков еды, липких разводов',
+    'Чай / сахар / вода в кулере есть',
+    'Мусорка поменяна, за мусоркой нет бутылок и грязи',
+  ]},
+  {id:'bar',icon:'💨',color:'si-amber',title:'ХОЛОДИЛЬНИКИ',items:[
+    'Вытяжка в рабочем состоянии',
+    'Барная стойка чистая — все три уровня',
+    'Электропечь чистая — нет пепла, сажи, разводов; рядом тоже чисто',
+    'Кадило пустое — нет остатков табака, углей, пепла',
+    'Кальяны собраны и чистые',
+    'Раковина чистая, рядом порядок',
+    'Мусорка поменяна',
+  ]},
+  {id:'hall',icon:'🖥️',color:'si-purple',title:'ОБЩИЙ ЗАЛ',items:[
+    'Стулья стоят ровно, у каждого есть подушка',
+    'Столы чистые — нет крошек, следов еды, разводов',
+    'Мышки стоят на месте, чистые',
+    'Клавиатуры в порядке — не залиты',
+    'Коврики сухие, нет крошек',
+  ]},
+  {id:'wc',icon:'🚻',color:'si-green',title:'ТУАЛЕТЫ',items:[
+    'Мыло есть',
+    'Туалетная бумага есть',
+    'Бумажные полотенца есть',
+    'Раковина чистая',
+    'Туалет чистый',
+    'Мусорка поменяна',
+  ]},
+  {id:'vip',icon:'👑',color:'si-cyan',title:'ВИП ЗАЛ',items:[
+    'Стулья стоят ровно, у каждого есть подушка',
+    'Столы чистые',
+    'Мышки стоят на месте, чистые',
+    'Клавиатуры в порядке',
+    'Коврики сухие',
+    'Мусорка поменяна',
+  ]},
+];
+
+// 14 зон закрытия смены
+const CLOSING_ZONES = [
+  {id:'holod',    icon:'❄️',  label:'Холодильники'},
+  {id:'musor_k',  icon:'🗑️', label:'Мусорка у кулера'},
+  {id:'musor_b',  icon:'🗑️', label:'Мусорка у бара'},
+  {id:'rakovina', icon:'🚿', label:'Раковина'},
+  {id:'plitka',   icon:'🔥', label:'Электро-плитка'},
+  {id:'kalgany',  icon:'💨', label:'Кальяны'},
+  {id:'musor_p',  icon:'🗑️', label:'Мусорка Prime'},
+  {id:'musor_v2', icon:'🗑️', label:'Мусорка VIP 2'},
+  {id:'musor_v3', icon:'🗑️', label:'Мусорка VIP 3'},
+  {id:'wc1',      icon:'🚻', label:'Туалет 1'},
+  {id:'wc2',      icon:'🚻', label:'Туалет 2'},
+  {id:'wc3',      icon:'🚻', label:'Туалет 3'},
+  {id:'wc4',      icon:'🚻', label:'Туалет 4'},
+  {id:'terminal', icon:'🖨️', label:'Чек закрытия смены на терминале'},
+];
+
+// STATE
+let shiftType = null;
+let checkState = {}; // {secId_itemIdx: bool}
+let taskState = {};
+let rating = null;
+let zonePhotos = {};
+let zonePhotoKey = null;
+let currentTab = 0;
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
 }
 
-function openZonePhoto(zoneId){
-  zonePhotoKey=zoneId;
-  document.getElementById('zone-photo-input').click();
+function goBack(){
+  if(confirm('Выйти? Прогресс сохранится.')) showScreen('welcome');
 }
 
-function handleZonePhoto(inp){
-  Array.from(inp.files).forEach(f=>{
-    const r=new FileReader();
-    r.onload=e=>{
-      if(!zonePhotos[zonePhotoKey]) zonePhotos[zonePhotoKey]=[];
-      zonePhotos[zonePhotoKey].push(e.target.result);
-      refreshZoneGrid();
-      showToast('📷 Зона сфоткана');
-    };
-    r.readAsDataURL(f);
+function resetApp(){
+  shiftType=null; checkState={}; taskState={}; rating=null; zonePhotos={};
+  currentTab=0;
+  showScreen('welcome');
+}
+
+function startShift(type){
+  shiftType = type;
+  checkState = {}; taskState = {}; rating = null; zonePhotos = {};
+  currentTab = 0;
+
+  const isDay = type === 'day';
+  document.getElementById('h-title').textContent = isDay ? 'Дневная смена' : 'Ночная смена';
+  document.getElementById('h-sub').textContent = isDay ? 'Утренний обход · пр. Героев, 31' : 'Вечерний обход · пр. Героев, 31';
+  const b = document.getElementById('h-badge');
+  b.textContent = isDay ? 'ДЕНЬ' : 'НОЧЬ';
+  b.className = 'header-badge ' + (isDay ? 'badge-day' : 'badge-night');
+  document.getElementById('prog-bar-0').className = 'progress-fill ' + (isDay ? 'fill-day' : 'fill-night');
+
+  const sb = document.getElementById('submit-btn');
+  sb.className = 'submit-btn ' + (isDay ? 'day' : 'night');
+
+  renderChecklist();
+  renderTasks();
+  renderZoneGrid();
+  switchTab(0);
+  showScreen('main');
+  updateProgress();
+}
+
+function switchTab(idx){
+  currentTab = idx;
+  document.querySelectorAll('.tab-pane').forEach((p,i)=>{
+    p.classList.toggle('active', i===idx);
   });
-  inp.value='';
+  const activeClass = shiftType==='night' ? 'active-night' : 'active';
+  document.querySelectorAll('.tab-item').forEach((t,i)=>{
+    t.className = 'tab-item' + (i===idx ? ' '+activeClass : '');
+  });
+  window.scrollTo(0,0);
 }
 
-function refreshZoneGrid(){
-  const grid=document.getElementById('zone-grid');
-  if(!grid) return;
-  grid.innerHTML=CLOSING_ZONES.map(z=>{
-    const photos=zonePhotos[z.id]||[];
-    const shot=photos.length>0;
+function renderChecklist(){
+  const secs = shiftType==='day' ? DAY_SECTIONS : NIGHT_SECTIONS;
+  const body = document.getElementById('checklist-body');
+  body.innerHTML = '';
+  const dotsEl = document.getElementById('sec-dots-0');
+  dotsEl.innerHTML = secs.map((_,i)=>`<div class="sec-dot" id="dot-${i}"></div>`).join('');
+
+  secs.forEach(sec=>{
+    const block = document.createElement('div');
+    block.className = 'section-block';
+    block.id = 'blk-'+sec.id;
+    block.innerHTML = `
+      <div class="section-header">
+        <div class="section-icon ${sec.color}">${sec.icon}</div>
+        <div class="section-title-text">${sec.title}</div>
+        <div class="section-count" id="sc-${sec.id}">0/${sec.items.length}</div>
+      </div>
+      <div class="sec-prog"><div class="sec-prog-fill" id="sp-${sec.id}" style="width:0%"></div></div>
+      <div class="items-list" id="il-${sec.id}"></div>
+      <div class="section-divider"></div>
+    `;
+    body.appendChild(block);
+    const list = block.querySelector('#il-'+sec.id);
+    sec.items.forEach((text, ii)=>{
+      const k = sec.id+'_'+ii;
+      if(!checkState[k]) checkState[k] = false;
+      list.appendChild(makeCheckItem(sec.id, ii, text));
+    });
+  });
+}
+
+function makeCheckItem(secId, ii, text){
+  const k = secId+'_'+ii;
+  const done = checkState[k];
+  const el = document.createElement('div');
+  el.id = 'ci-'+k;
+  el.className = 'check-item' + (done ? ' done' : '');
+  el.onclick = ()=>toggleItem(secId, ii);
+  el.innerHTML = `
+    <div class="checkmark">${done?'✓':''}</div>
+    <div class="item-content">
+      <div class="item-text">${text}</div>
+    </div>`;
+  return el;
+}
+
+function toggleItem(secId, ii){
+  const k = secId+'_'+ii;
+  checkState[k] = !checkState[k];
+  const secs = shiftType==='day' ? DAY_SECTIONS : NIGHT_SECTIONS;
+  const sec = secs.find(s=>s.id===secId);
+  document.getElementById('ci-'+k).replaceWith(makeCheckItem(secId, ii, sec.items[ii]));
+  updateProgress();
+}
+
+function updateProgress(){
+  const secs = shiftType==='day' ? DAY_SECTIONS : NIGHT_SECTIONS;
+  let total=0, done=0;
+  secs.forEach((sec,si)=>{
+    let sd=0;
+    sec.items.forEach((_,ii)=>{ if(checkState[sec.id+'_'+ii]){done++;sd++;} total++; });
+    const sp = document.getElementById('sp-'+sec.id);
+    const sc = document.getElementById('sc-'+sec.id);
+    if(sp) sp.style.width = (sec.items.length ? sd/sec.items.length*100 : 0)+'%';
+    if(sc) sc.textContent = sd+'/'+sec.items.length;
+    const dot = document.getElementById('dot-'+si);
+    if(dot) dot.className = 'sec-dot'+(sd===sec.items.length?' done':sd>0?' partial':'');
+  });
+  const pct = total ? done/total*100 : 0;
+  document.getElementById('prog-bar-0').style.width = pct+'%';
+  document.getElementById('prog-count-0').textContent = done+' / '+total;
+}
+
+function renderTasks(){
+  const dow = new Date().getDay();
+  const dayName = DAYS[dow];
+  const today = WEEKLY[dow] || [];
+  const body = document.getElementById('tasks-body');
+  body.innerHTML = `
+    <div class="tasks-card">
+      <div class="tasks-hdr"><span>📋</span><span>ЗАДАЧИ НА СМЕНУ</span><div class="day-pill">${dayName}</div></div>
+      ${today.map((t,i)=>`
+        <div class="task-row" id="tr-${i}" onclick="toggleTask(${i})">
+          <div class="task-chk" id="tc-${i}"></div>
+          <div class="task-text">${t}</div>
+        </div>`).join('')}
+      ${!today.length?'<div style="padding:14px;font-size:13px;color:var(--text3);text-align:center">Нет задач на сегодня 🎉</div>':''}
+      <div style="padding:10px 14px;font-size:11px;color:var(--text3);border-top:1px solid rgba(255,255,255,0.04)">⚠️ Задачи необязательны — можно отправить отчёт даже если не все выполнены</div>
+    </div>`;
+}
+
+function toggleTask(i){
+  taskState[i] = !taskState[i];
+  const r = document.getElementById('tr-'+i);
+  const c = document.getElementById('tc-'+i);
+  if(taskState[i]){
+    r.classList.add('done');
+    c.textContent='✓';
+    c.style.cssText='background:var(--green);border-color:var(--green);color:#fff;font-size:10px;font-weight:700';
+  } else {
+    r.classList.remove('done');
+    c.textContent='';
+    c.style.cssText='';
+  }
+}
+
+function renderZoneGrid(){
+  document.getElementById('zone-grid').innerHTML = CLOSING_ZONES.map(z=>{
+    const photos = zonePhotos[z.id] || [];
+    const shot = photos.length > 0;
     return `<div class="zone-btn${shot?' shot':''}" onclick="openZonePhoto('${z.id}')">
       ${shot?`<div class="zone-count">${photos.length}</div>`:''}
       <span class="zone-icon">${z.icon}</span>
@@ -611,132 +621,113 @@ function refreshZoneGrid(){
     </div>`;
   }).join('');
 }
-function setRating(r){
-  rating=r;
-  ['good','ok','bad'].forEach(x=>{
-    const el=document.getElementById('rb-'+x);
-    if(el)el.className='rb'+(r===x?' '+x:'');
-  });
+
+function openZonePhoto(zoneId){
+  zonePhotoKey = zoneId;
+  document.getElementById('zone-photo-input').click();
 }
 
-function updateProgress(){
-  const secs=shiftType==='day'?DAY:NIGHT;
-  let total=0,done=0;
-  secs.forEach((sec,si)=>{
-    let sd=0;
-    sec.items.forEach((_,ii)=>{if(state[key(sec.id,ii)]?.done){done++;sd++};total++});
-    const sp=document.getElementById('sp-'+sec.id);
-    const sc=document.getElementById('sc-'+sec.id);
-    if(sp)sp.style.width=(sec.items.length?sd/sec.items.length*100:0)+'%';
-    if(sc)sc.textContent=sd+'/'+sec.items.length;
-    const dot=document.getElementById('dot-'+si);
-    if(dot)dot.className='sec-dot'+(sd===sec.items.length?' done':sd>0?' partial':'');
+function handleZonePhoto(inp){
+  Array.from(inp.files).forEach(f=>{
+    const r = new FileReader();
+    r.onload = e=>{
+      if(!zonePhotos[zonePhotoKey]) zonePhotos[zonePhotoKey]=[];
+      zonePhotos[zonePhotoKey].push(e.target.result);
+      renderZoneGrid();
+      showToast('📷 Зона сфоткана');
+    };
+    r.readAsDataURL(f);
   });
-  const pct=total?done/total*100:0;
-  document.getElementById('prog-bar').style.width=pct+'%';
-  document.getElementById('prog-count').textContent=done+' / '+total;
-  const sp2=document.getElementById('sub-prog');
-  if(sp2) sp2.textContent = done < total ? `обход: ${done}/${total}` : '';
+  inp.value='';
+}
+
+function setRating(r){
+  rating = r;
+  ['good','ok','bad'].forEach(x=>{
+    const el = document.getElementById('rb-'+x);
+    if(el) el.className = 'rb'+(r===x?' '+x:'');
+  });
 }
 
 function base64ToBlob(base64){
-  const [header,data]=base64.split(',');
-  const mime=header.match(/:(.*?);/)[1];
-  const binary=atob(data);
-  const arr=new Uint8Array(binary.length);
+  const [header,data] = base64.split(',');
+  const mime = header.match(/:(.*?);/)[1];
+  const binary = atob(data);
+  const arr = new Uint8Array(binary.length);
   for(let i=0;i<binary.length;i++) arr[i]=binary.charCodeAt(i);
   return new Blob([arr],{type:mime});
 }
 
-async function uploadPhotosToTelegram(secs){
-  const allPhotos=[];
-  // Фото из чеклиста
-  secs.forEach(sec=>{
-    sec.items.forEach((item,ii)=>{
-      const k=key(sec.id,ii);
-      if(state[k]?.photos?.length){
-        state[k].photos.forEach(photo=>allPhotos.push(photo));
-      }
-    });
-  });
-  // Фото зон закрытия
+async function uploadZonePhotos(){
+  const allPhotos = [];
   CLOSING_ZONES.forEach(z=>{
     (zonePhotos[z.id]||[]).forEach(photo=>allPhotos.push(photo));
   });
   if(!allPhotos.length) return 0;
 
-  // Telegram sendMediaGroup: максимум 10 фото за раз
-  const chunks=[];
+  const chunks = [];
   for(let i=0;i<allPhotos.length;i+=10) chunks.push(allPhotos.slice(i,i+10));
 
-  let sent=0;
+  let sent = 0;
   for(const chunk of chunks){
     try{
-      const fd=new FormData();
+      const fd = new FormData();
       fd.append('chat_id', REPORT_CHAT_ID_JS);
-      const mediaArr=chunk.map((_,i)=>({type:'photo',media:`attach://photo${i}`}));
+      const mediaArr = chunk.map((_,i)=>({type:'photo',media:`attach://photo${i}`}));
       fd.append('media', JSON.stringify(mediaArr));
       chunk.forEach((photo,i)=>fd.append(`photo${i}`, base64ToBlob(photo), `photo${i}.jpg`));
-      const res=await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup`,{method:'POST',body:fd});
-      if(res.ok) sent+=chunk.length;
-    }catch(e){ console.error('Album upload failed',e); }
+      const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup`,{method:'POST',body:fd});
+      if(res.ok) sent += chunk.length;
+    } catch(e){ console.error('Album upload failed',e); }
   }
   return sent;
 }
 
 async function submitShift(){
-  const sb=document.getElementById('submit-btn');
-  sb.disabled=true;
+  const sb = document.getElementById('submit-btn');
+  sb.disabled = true;
 
-  const secs=shiftType==='day'?DAY:NIGHT;
-  const total=secs.reduce((a,s)=>a+s.items.length,0);
-  const done=Object.values(state).filter(s=>s.done).length;
-  const checklistPhotos=Object.values(state).reduce((a,s)=>a+s.photos.length,0);
-  const zonePhotosCount=Object.values(zonePhotos).reduce((a,p)=>a+p.length,0);
-  const photos=checklistPhotos+zonePhotosCount;
-  const now=new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  const isDay=shiftType==='day';
-  const cash=document.getElementById('h-cash')?.value||'';
-  const next=document.getElementById('h-next')?.value||'';
-  const notes=document.getElementById('h-notes')?.value||'';
-  const ratingMap={good:'😎 Отлично',ok:'😐 Нормально',bad:'😤 Тяжело'};
-  const dow=new Date().getDay();
-  const todayTasks=WEEKLY[dow]||[];
-  const doneTasks=Object.values(taskState).filter(Boolean).length;
-  const totalTasks=todayTasks.length;
-  const incompleteTasks=todayTasks.filter((_,i)=>!taskState[i]);
+  const secs = shiftType==='day' ? DAY_SECTIONS : NIGHT_SECTIONS;
+  const total = secs.reduce((a,s)=>a+s.items.length, 0);
+  const done = Object.values(checkState).filter(Boolean).length;
+  const zonePhotosCount = Object.values(zonePhotos).reduce((a,p)=>a+p.length, 0);
 
-  const unchecked={};
-  secs.forEach(sec=>{
-    const missed=sec.items.filter((_,ii)=>!state[key(sec.id,ii)]?.done).map(i=>i.t);
-    if(missed.length) unchecked[sec.title]=missed;
-  });
+  const now = new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const isDay = shiftType === 'day';
+  const cash = document.getElementById('h-cash')?.value || '';
+  const next = document.getElementById('h-next')?.value || '';
+  const notes = document.getElementById('h-notes')?.value || '';
+  const ratingMap = {good:'😎 Отлично',ok:'😐 Нормально',bad:'😤 Тяжело'};
+  const dow = new Date().getDay();
+  const todayTasks = WEEKLY[dow] || [];
+  const doneTasks = Object.values(taskState).filter(Boolean).length;
+  const totalTasks = todayTasks.length;
+  const incompleteTasks = todayTasks.filter((_,i)=>!taskState[i]);
 
-  const payload={
+  const payload = {
     shift:shiftType, datetime:now,
     checklist:{done,total},
     tasks:{done:doneTasks,total:totalTasks,incomplete:incompleteTasks},
     handover:{next,cash,rating,notes},
-    unchecked, photos_total:photos,
+    photos_total:zonePhotosCount,
   };
 
-  // Сначала загружаем фото
-  if(photos>0){
-    sb.innerHTML=`<span>📸</span><span>Отправляем фото...</span>`;
-    await uploadPhotosToTelegram(secs);
+  if(zonePhotosCount > 0){
+    sb.innerHTML = '<span>📸</span><span>Отправляем фото...</span>';
+    await uploadZonePhotos();
   }
 
-  sb.innerHTML='<span>⏳</span><span>Отправляем отчёт...</span>';
+  sb.innerHTML = '<span>⏳</span><span>Отправляем отчёт...</span>';
 
-  document.getElementById('done-title').textContent=isDay?'✅ Дневная смена сдана!':'✅ Ночная смена сдана!';
-  document.getElementById('done-sub').textContent='Отчёт отправлен управляющему. '+(isDay?'Хорошего вечера! 🌆':'Хорошего отдыха! 😴');
-  document.getElementById('done-stats').innerHTML=`
+  document.getElementById('done-title').textContent = isDay ? '✅ Дневная смена сдана!' : '✅ Ночная смена сдана!';
+  document.getElementById('done-sub').textContent = 'Отчёт отправлен управляющему. ' + (isDay ? 'Хорошего вечера! 🌆' : 'Хорошего отдыха! 😴');
+  document.getElementById('done-stats').innerHTML = `
     <div class="stat-row"><span class="stat-label">Дата и время</span><span class="stat-val">${now}</span></div>
     <div class="stat-row"><span class="stat-label">Смена</span><span class="stat-val">${isDay?'Дневная 🌅':'Ночная 🌙'}</span></div>
-    <div class="stat-row"><span class="stat-label">Обход</span><span class="stat-val" style="color:var(--green)">✅ ${done} / ${total}</span></div>
+    <div class="stat-row"><span class="stat-label">Принятие смены</span><span class="stat-val" style="color:var(--green)">✅ ${done} / ${total}</span></div>
     <div class="stat-row"><span class="stat-label">Задачи</span><span class="stat-val" style="color:${doneTasks===totalTasks?'var(--green)':'var(--amber)'}">${doneTasks} / ${totalTasks}${doneTasks<totalTasks?' ⚠️':' ✅'}</span></div>
     ${incompleteTasks.length?`<div class="stat-row"><span class="stat-label" style="color:var(--amber)">Не выполнено</span><span class="stat-val" style="font-size:12px;color:var(--amber)">${incompleteTasks.join(', ')}</span></div>`:''}
-    <div class="stat-row"><span class="stat-label">Фото отправлено</span><span class="stat-val">${photos}</span></div>
+    <div class="stat-row"><span class="stat-label">Фото зон</span><span class="stat-val">${zonePhotosCount}</span></div>
     <div class="stat-row"><span class="stat-label">Касса</span><span class="stat-val">${cash||'—'} ₽</span></div>
     <div class="stat-row"><span class="stat-label">Принимает смену</span><span class="stat-val">${next||'—'}</span></div>
     <div class="stat-row"><span class="stat-label">Оценка смены</span><span class="stat-val">${rating?ratingMap[rating]:'—'}</span></div>
@@ -748,9 +739,10 @@ async function submitShift(){
 }
 
 function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2000);
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2000);
 }
 </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Cyber Space — Смены v3</title>
+<title>Cyber Space — Смены v4</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +16,7 @@
   --text:#f0f0ff;--text2:#8888aa;--text3:#555577;
   --border:rgba(124,58,237,0.2);--border2:rgba(6,182,212,0.15);
   --glow-p:0 0 20px rgba(124,58,237,0.3);--glow-c:0 0 20px rgba(6,182,212,0.3);
-  --r:12px;--tab-h:62px;
+  --r:14px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{min-height:100vh;overflow-x:hidden}
@@ -26,7 +26,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .screen{display:none;min-height:100vh}
 .screen.active{display:block}
 
-/* WELCOME */
+/* ─── WELCOME ─────────────────────────────── */
 .welcome-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px;background:radial-gradient(ellipse at 50% 0%,rgba(124,58,237,0.15) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(6,182,212,0.1) 0%,transparent 50%),var(--bg)}
 .logo-wrap{width:90px;height:90px;border-radius:22px;margin-bottom:28px;background:linear-gradient(135deg,#7c3aed,#06b6d4);display:flex;align-items:center;justify-content:center;box-shadow:var(--glow-p);animation:float 3s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
@@ -36,43 +36,69 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .shift-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:380px}
 .shift-card{background:var(--card);border-radius:16px;padding:22px 16px;cursor:pointer;transition:all 0.2s;text-align:center;border:1px solid transparent;user-select:none}
 .shift-card:active{transform:scale(0.96)}
-.shift-card.day:hover,.shift-card.day:active{border-color:var(--purple);box-shadow:var(--glow-p)}
-.shift-card.night:hover,.shift-card.night:active{border-color:var(--cyan);box-shadow:var(--glow-c)}
+.shift-card.day:active,.shift-card.day:hover{border-color:var(--purple);box-shadow:var(--glow-p)}
+.shift-card.night:active,.shift-card.night:hover{border-color:var(--cyan);box-shadow:var(--glow-c)}
 .shift-icon{font-size:38px;margin-bottom:10px;display:block}
 .shift-label{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:600;letter-spacing:0.5px;margin-bottom:4px}
 .shift-card.day .shift-label{color:var(--purple2)}
 .shift-card.night .shift-label{color:var(--cyan)}
 .shift-desc{font-size:12px;color:var(--text3);line-height:1.5}
 
-/* HEADER */
+/* ─── HUB MENU ─────────────────────────────── */
+.hub-screen{display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:0 0 32px}
+.hub-header{width:100%;background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.hub-back{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:18px;color:var(--text2)}
+.hub-logo{width:36px;height:36px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--purple),var(--cyan));display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;color:#fff}
+.hub-info{flex:1;min-width:0}
+.hub-info h1{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700}
+.hub-info p{font-size:11px;color:var(--text2);margin-top:1px}
+.hub-badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;flex-shrink:0}
+.badge-day{background:rgba(124,58,237,0.2);color:var(--purple2);border:1px solid rgba(124,58,237,0.3)}
+.badge-night{background:rgba(6,182,212,0.15);color:var(--cyan);border:1px solid rgba(6,182,212,0.25)}
+.hub-body{width:100%;max-width:480px;padding:28px 16px;display:flex;flex-direction:column;gap:14px;align-self:center}
+.hub-greeting{text-align:center;margin-bottom:6px}
+.hub-greeting h2{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:var(--text)}
+.hub-greeting p{font-size:13px;color:var(--text2);margin-top:4px}
+
+.menu-card{background:var(--card);border-radius:18px;border:1.5px solid rgba(255,255,255,0.07);padding:20px 20px;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;gap:16px;user-select:none;position:relative;overflow:hidden}
+.menu-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.2s}
+.menu-card:active{transform:scale(0.97)}
+.menu-card.c1::before{background:linear-gradient(135deg,rgba(124,58,237,0.08),transparent)}
+.menu-card.c2::before{background:linear-gradient(135deg,rgba(245,158,11,0.08),transparent)}
+.menu-card.c3::before{background:linear-gradient(135deg,rgba(6,182,212,0.08),transparent)}
+.menu-card:active::before{opacity:1}
+.menu-card.c1{border-color:rgba(124,58,237,0.25)}
+.menu-card.c2{border-color:rgba(245,158,11,0.2)}
+.menu-card.c3{border-color:rgba(6,182,212,0.2)}
+.menu-icon-wrap{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.menu-card.c1 .menu-icon-wrap{background:rgba(124,58,237,0.18)}
+.menu-card.c2 .menu-icon-wrap{background:rgba(245,158,11,0.15)}
+.menu-card.c3 .menu-icon-wrap{background:rgba(6,182,212,0.15)}
+.menu-text{flex:1;min-width:0}
+.menu-title{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;letter-spacing:0.3px;color:var(--text);margin-bottom:3px}
+.menu-desc{font-size:12px;color:var(--text2);line-height:1.4}
+.menu-arrow{font-size:20px;color:var(--text3);flex-shrink:0}
+.menu-progress{margin-top:12px;display:flex;align-items:center;gap:8px}
+.menu-prog-track{flex:1;height:4px;background:rgba(255,255,255,0.07);border-radius:2px;overflow:hidden}
+.menu-prog-fill{height:100%;border-radius:2px;transition:width 0.4s}
+.c1 .menu-prog-fill{background:linear-gradient(90deg,var(--purple),var(--purple2))}
+.c2 .menu-prog-fill{background:linear-gradient(90deg,var(--amber),#fbbf24)}
+.c3 .menu-prog-fill{background:linear-gradient(90deg,var(--cyan),var(--cyan2))}
+.menu-prog-label{font-size:11px;color:var(--text3);flex-shrink:0;min-width:36px;text-align:right}
+.menu-status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;position:absolute;top:14px;right:14px}
+.dot-done{background:var(--green);box-shadow:0 0 6px rgba(16,185,129,0.5)}
+.dot-partial{background:var(--amber)}
+.dot-empty{background:rgba(255,255,255,0.1)}
+
+/* ─── SECTION HEADER ─────────────────────────── */
 .app-header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 16px;position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:12px}
 .back-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:18px;color:var(--text2)}
-.header-logo{width:36px;height:36px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--purple),var(--cyan));display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px}
+.header-logo{width:36px;height:36px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--purple),var(--cyan));display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;color:#fff}
 .header-info{flex:1;min-width:0}
 .header-info h1{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .header-info p{font-size:11px;color:var(--text2);margin-top:1px}
-.header-badge{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;flex-shrink:0}
-.badge-day{background:rgba(124,58,237,0.2);color:var(--purple2);border:1px solid rgba(124,58,237,0.3)}
-.badge-night{background:rgba(6,182,212,0.15);color:var(--cyan);border:1px solid rgba(6,182,212,0.25)}
 
-/* TAB BAR */
-.tab-bar{position:fixed;bottom:0;left:0;right:0;height:var(--tab-h);background:var(--bg2);border-top:1px solid var(--border);display:flex;z-index:200}
-.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:all 0.2s;user-select:none;position:relative;padding:6px 4px}
-.tab-item:active{background:rgba(255,255,255,0.04)}
-.tab-icon{font-size:20px;line-height:1}
-.tab-label{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.3px;color:var(--text3);transition:color 0.2s}
-.tab-item.active .tab-label{color:var(--purple2)}
-.tab-item.active-night .tab-label{color:var(--cyan)}
-.tab-indicator{position:absolute;top:0;left:50%;transform:translateX(-50%);width:30px;height:2px;border-radius:0 0 2px 2px;background:var(--purple);opacity:0;transition:opacity 0.2s}
-.tab-item.active .tab-indicator{opacity:1}
-.tab-item.active-night .tab-indicator{background:var(--cyan);opacity:1}
-.tab-badge{position:absolute;top:5px;right:calc(50% - 18px);background:var(--green);color:#fff;font-size:9px;font-weight:700;border-radius:8px;padding:1px 5px;min-width:16px;text-align:center}
-
-/* TAB CONTENT */
-.tab-pane{display:none;padding-bottom:calc(var(--tab-h) + 16px)}
-.tab-pane.active{display:block}
-
-/* PROGRESS */
+/* ─── PROGRESS ─────────────────────────────── */
 .progress-wrap{padding:12px 16px;background:var(--bg2);border-bottom:1px solid rgba(255,255,255,0.04)}
 .progress-header{display:flex;justify-content:space-between;margin-bottom:8px}
 .progress-label{font-size:12px;color:var(--text2);font-weight:500}
@@ -86,7 +112,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .sec-dot.done{background:var(--green)}
 .sec-dot.partial{background:var(--amber)}
 
-/* SECTIONS */
+/* ─── SECTIONS / CHECKLIST ─────────────────── */
 .section-block{margin:0}
 .section-header{padding:14px 16px 8px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.04)}
 .section-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
@@ -109,7 +135,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .item-text{font-size:13.5px;line-height:1.5;color:var(--text)}
 .section-divider{height:8px;background:var(--bg);border-top:1px solid rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.03)}
 
-/* TASKS */
+/* ─── TASKS ─────────────────────────────── */
 .tasks-card{margin:12px 16px;background:var(--card);border-radius:var(--r);border:1px solid var(--border);overflow:hidden}
 .tasks-hdr{padding:12px 14px;background:rgba(124,58,237,0.1);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600}
 .day-pill{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--purple);color:#fff;margin-left:auto}
@@ -121,18 +147,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .task-row.done .task-chk{background:var(--green);border-color:var(--green);color:#fff}
 .task-text{font-size:13px;line-height:1.5;color:var(--text)}
 
-/* ZONE PHOTO BUTTONS */
+/* ─── ZONE PHOTO BUTTONS ─────────────────── */
 .zone-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px}
 .zone-btn{background:var(--card2);border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:18px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all 0.2s;user-select:none;position:relative}
 .zone-btn:active{transform:scale(0.96)}
 .zone-btn.shot{background:rgba(16,185,129,0.12);border-color:var(--green)}
 .zone-btn .zone-icon{font-size:32px}
-.zone-btn .zone-label{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.3px;color:var(--text);text-align:center}
+.zone-btn .zone-label{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.3px;color:var(--text);text-align:center;line-height:1.3}
 .zone-btn .zone-hint{font-size:10px;color:var(--cyan);text-align:center}
 .zone-btn.shot .zone-hint{color:var(--green)}
 .zone-btn .zone-count{position:absolute;top:8px;right:8px;background:var(--green);color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:2px 6px}
 
-/* HANDOVER */
+/* ─── HANDOVER ─────────────────────────── */
 .handover-card{margin:12px 16px;background:var(--card);border-radius:var(--r);border:1px solid var(--border2);overflow:hidden}
 .handover-hdr{padding:12px 14px;background:rgba(6,182,212,0.08);border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:8px;font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:600;color:var(--cyan)}
 .handover-body{padding:14px;display:flex;flex-direction:column;gap:12px}
@@ -150,15 +176,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .rb.ok{background:rgba(245,158,11,0.15);border-color:var(--amber);color:var(--amber)}
 .rb.bad{background:rgba(239,68,68,0.15);border-color:var(--red);color:var(--red)}
 
-/* SUBMIT */
-.submit-wrap{padding:16px 16px 8px}
+/* ─── SUBMIT ─────────────────────────────── */
+.submit-wrap{padding:16px 16px 32px}
 .submit-btn{width:100%;padding:15px;border:none;border-radius:var(--r);font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:0.5px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
 .submit-btn.day{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;box-shadow:0 4px 20px rgba(124,58,237,0.35)}
 .submit-btn.night{background:linear-gradient(135deg,#0e7490,var(--cyan));color:#000;box-shadow:0 4px 20px rgba(6,182,212,0.25)}
 .submit-btn:active:not(:disabled){transform:scale(0.98)}
-.sub-prog{font-size:12px;opacity:0.7}
 
-/* DONE */
+/* ─── DONE ─────────────────────────────── */
 .done-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;background:radial-gradient(ellipse at 50% 30%,rgba(16,185,129,0.12) 0%,transparent 60%),var(--bg)}
 .done-icon{font-size:72px;margin-bottom:20px;animation:pop 0.5s cubic-bezier(0.34,1.56,0.64,1)}
 @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
@@ -172,17 +197,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .restart-btn{width:100%;max-width:360px;padding:15px;border:none;border-radius:var(--r);background:linear-gradient(135deg,var(--purple),var(--cyan));font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 20px rgba(124,58,237,0.3);transition:all 0.2s}
 .restart-btn:active{transform:scale(0.98)}
 
-/* TOAST */
+/* ─── TOAST ─────────────────────────────── */
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;z-index:9999;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 input[type=file]{display:none}
+.scroll-body{padding-bottom:24px}
 </style>
 </head>
 <body>
 
 <div class="toast" id="toast">📷 Фото добавлено</div>
 
-<!-- WELCOME -->
+<!-- ══ WELCOME ══ -->
 <div class="screen active" id="screen-welcome">
   <div class="welcome-screen">
     <div class="logo-wrap"><div class="logo-letters">CS</div></div>
@@ -203,99 +229,156 @@ input[type=file]{display:none}
   </div>
 </div>
 
-<!-- MAIN APP -->
-<div class="screen" id="screen-main">
-  <div class="app-header">
-    <div class="back-btn" onclick="goBack()">←</div>
-    <div class="header-logo">CS</div>
-    <div class="header-info">
-      <h1 id="h-title">Дневная смена</h1>
-      <p id="h-sub">пр. Героев, 31</p>
-    </div>
-    <div class="header-badge badge-day" id="h-badge">ДЕНЬ</div>
-  </div>
-
-  <!-- TAB 1: ПРИНЯТИЕ СМЕНЫ -->
-  <div class="tab-pane active" id="pane-0">
-    <div class="progress-wrap">
-      <div class="progress-header">
-        <span class="progress-label">Принятие смены</span>
-        <span class="progress-count" id="prog-count-0">0 / 0</span>
+<!-- ══ HUB MENU ══ -->
+<div class="screen" id="screen-hub">
+  <div class="hub-screen">
+    <div class="hub-header">
+      <div class="hub-back" onclick="resetApp()">←</div>
+      <div class="hub-logo">CS</div>
+      <div class="hub-info">
+        <h1 id="hub-title">Дневная смена</h1>
+        <p>пр. Героев, 31</p>
       </div>
-      <div class="progress-track"><div class="progress-fill fill-day" id="prog-bar-0" style="width:0%"></div></div>
-      <div class="sec-dots" id="sec-dots-0"></div>
+      <div class="hub-badge badge-day" id="hub-badge">ДЕНЬ</div>
     </div>
-    <div id="checklist-body"></div>
-  </div>
+    <div class="hub-body">
+      <div class="hub-greeting">
+        <h2 id="hub-greeting-text">Начинаем смену!</h2>
+        <p id="hub-greeting-sub">Выбери раздел чеклиста</p>
+      </div>
 
-  <!-- TAB 2: ЗАДАЧИ -->
-  <div class="tab-pane" id="pane-1">
-    <div id="tasks-body" style="padding:12px 0 0"></div>
-  </div>
-
-  <!-- TAB 3: ЗАКРЫТИЕ СМЕНЫ -->
-  <div class="tab-pane" id="pane-2">
-    <div style="padding:14px 16px 6px">
-      <div style="font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--cyan);margin-bottom:4px">📷 ЗАКРЫТИЕ СМЕНЫ</div>
-      <div style="font-size:12px;color:var(--text2)">Сфотографируй каждую зону перед закрытием</div>
-    </div>
-    <div class="zone-grid" id="zone-grid"></div>
-    <div class="handover-card">
-      <div class="handover-hdr"><span>📋</span><span>ПЕРЕДАЧА СМЕНЫ</span></div>
-      <div class="handover-body">
-        <div>
-          <div class="fl">Кому передаю смену</div>
-          <input class="fi" id="h-next" type="text" placeholder="Имя следующего администратора">
-        </div>
-        <div>
-          <div class="fl">Сумма в кассе</div>
-          <div class="cash-row">
-            <input class="fi" id="h-cash" type="number" placeholder="0" inputmode="numeric">
-            <span class="cash-sym">₽</span>
+      <!-- Card 1: Принятие смены -->
+      <div class="menu-card c1" onclick="openSection('checklist')">
+        <div class="menu-status-dot dot-empty" id="dot-checklist"></div>
+        <div class="menu-icon-wrap">✅</div>
+        <div class="menu-text">
+          <div class="menu-title">Принятие смены</div>
+          <div class="menu-desc">Проверь все зоны и поставь галочки</div>
+          <div class="menu-progress">
+            <div class="menu-prog-track"><div class="menu-prog-fill" id="hub-prog-checklist" style="width:0%"></div></div>
+            <div class="menu-prog-label" id="hub-label-checklist">0 / 0</div>
           </div>
         </div>
-        <div>
-          <div class="fl">Оцени смену</div>
-          <div class="rating-grid">
-            <div class="rb" id="rb-good" onclick="setRating('good')"><span class="rb-emoji">😎</span>Отлично</div>
-            <div class="rb" id="rb-ok"   onclick="setRating('ok')"><span class="rb-emoji">😐</span>Нормально</div>
-            <div class="rb" id="rb-bad"  onclick="setRating('bad')"><span class="rb-emoji">😤</span>Тяжело</div>
+        <div class="menu-arrow">›</div>
+      </div>
+
+      <!-- Card 2: Задачи на смену -->
+      <div class="menu-card c2" onclick="openSection('tasks')">
+        <div class="menu-status-dot dot-empty" id="dot-tasks"></div>
+        <div class="menu-icon-wrap">📋</div>
+        <div class="menu-text">
+          <div class="menu-title">Задачи на смену</div>
+          <div class="menu-desc" id="hub-tasks-desc">Еженедельные задачи</div>
+          <div class="menu-progress">
+            <div class="menu-prog-track"><div class="menu-prog-fill" id="hub-prog-tasks" style="width:0%"></div></div>
+            <div class="menu-prog-label" id="hub-label-tasks">0 / 0</div>
           </div>
         </div>
-        <div>
-          <div class="fl">Заметки / инциденты / поломки</div>
-          <textarea class="fi" id="h-notes" rows="3" placeholder="Что важно знать следующей смене: поломки, конфликты, нехватка товара..."></textarea>
-        </div>
+        <div class="menu-arrow">›</div>
       </div>
-    </div>
-    <div class="submit-wrap">
-      <button class="submit-btn day" id="submit-btn" onclick="submitShift()">
-        <span>✅</span><span>Завершить и отправить отчёт</span><span class="sub-prog" id="sub-prog"></span>
-      </button>
-    </div>
-  </div>
 
-  <!-- TAB BAR -->
-  <div class="tab-bar">
-    <div class="tab-item active" id="tab-0" onclick="switchTab(0)">
-      <div class="tab-indicator"></div>
-      <span class="tab-icon">✅</span>
-      <span class="tab-label">Принятие</span>
-    </div>
-    <div class="tab-item" id="tab-1" onclick="switchTab(1)">
-      <div class="tab-indicator"></div>
-      <span class="tab-icon">📋</span>
-      <span class="tab-label">Задачи</span>
-    </div>
-    <div class="tab-item" id="tab-2" onclick="switchTab(2)">
-      <div class="tab-indicator"></div>
-      <span class="tab-icon">🔒</span>
-      <span class="tab-label">Закрытие</span>
+      <!-- Card 3: Закрытие смены -->
+      <div class="menu-card c3" onclick="openSection('closing')">
+        <div class="menu-status-dot dot-empty" id="dot-closing"></div>
+        <div class="menu-icon-wrap">🔒</div>
+        <div class="menu-text">
+          <div class="menu-title">Закрытие смены</div>
+          <div class="menu-desc">Сфотографируй зоны и отправь отчёт</div>
+          <div class="menu-progress">
+            <div class="menu-prog-track"><div class="menu-prog-fill" id="hub-prog-closing" style="width:0%"></div></div>
+            <div class="menu-prog-label" id="hub-label-closing">0 / 14</div>
+          </div>
+        </div>
+        <div class="menu-arrow">›</div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- DONE -->
+<!-- ══ SECTION: CHECKLIST ══ -->
+<div class="screen" id="screen-checklist">
+  <div class="app-header">
+    <div class="back-btn" onclick="showScreen('hub')">←</div>
+    <div class="header-logo">CS</div>
+    <div class="header-info">
+      <h1>Принятие смены</h1>
+      <p id="cl-sub">Дневная смена · пр. Героев, 31</p>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-header">
+      <span class="progress-label">Прогресс</span>
+      <span class="progress-count" id="prog-count">0 / 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill fill-day" id="prog-bar" style="width:0%"></div></div>
+    <div class="sec-dots" id="sec-dots"></div>
+  </div>
+  <div class="scroll-body" id="checklist-body"></div>
+</div>
+
+<!-- ══ SECTION: TASKS ══ -->
+<div class="screen" id="screen-tasks">
+  <div class="app-header">
+    <div class="back-btn" onclick="showScreen('hub')">←</div>
+    <div class="header-logo">CS</div>
+    <div class="header-info">
+      <h1>Задачи на смену</h1>
+      <p>Еженедельные задачи</p>
+    </div>
+  </div>
+  <div class="scroll-body" id="tasks-body" style="padding-top:12px"></div>
+</div>
+
+<!-- ══ SECTION: CLOSING ══ -->
+<div class="screen" id="screen-closing">
+  <div class="app-header">
+    <div class="back-btn" onclick="showScreen('hub')">←</div>
+    <div class="header-logo">CS</div>
+    <div class="header-info">
+      <h1>Закрытие смены</h1>
+      <p id="cl2-sub">Сфотографируй зоны</p>
+    </div>
+  </div>
+  <div style="padding:14px 16px 6px">
+    <div style="font-size:12px;color:var(--text2)">Нажми на зону чтобы сфотографировать</div>
+  </div>
+  <div class="zone-grid" id="zone-grid"></div>
+  <div class="handover-card">
+    <div class="handover-hdr"><span>📋</span><span>ПЕРЕДАЧА СМЕНЫ</span></div>
+    <div class="handover-body">
+      <div>
+        <div class="fl">Кому передаю смену</div>
+        <input class="fi" id="h-next" type="text" placeholder="Имя следующего администратора">
+      </div>
+      <div>
+        <div class="fl">Сумма в кассе</div>
+        <div class="cash-row">
+          <input class="fi" id="h-cash" type="number" placeholder="0" inputmode="numeric">
+          <span class="cash-sym">₽</span>
+        </div>
+      </div>
+      <div>
+        <div class="fl">Оцени смену</div>
+        <div class="rating-grid">
+          <div class="rb" id="rb-good" onclick="setRating('good')"><span class="rb-emoji">😎</span>Отлично</div>
+          <div class="rb" id="rb-ok"   onclick="setRating('ok')"><span class="rb-emoji">😐</span>Нормально</div>
+          <div class="rb" id="rb-bad"  onclick="setRating('bad')"><span class="rb-emoji">😤</span>Тяжело</div>
+        </div>
+      </div>
+      <div>
+        <div class="fl">Заметки / инциденты / поломки</div>
+        <textarea class="fi" id="h-notes" rows="3" placeholder="Что важно знать следующей смене: поломки, конфликты, нехватка товара..."></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="submit-wrap">
+    <button class="submit-btn day" id="submit-btn" onclick="submitShift()">
+      <span>✅</span><span>Завершить и отправить отчёт</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══ DONE ══ -->
 <div class="screen" id="screen-done">
   <div class="done-screen">
     <div class="done-icon">🎉</div>
@@ -326,7 +409,6 @@ const WEEKLY = {
   6:['Протереть всю периферию: мышки, наушники','Протереть входную дверь и стёкла'],
 };
 
-// Чеклист принятия смены (только галочки, без фото)
 const DAY_SECTIONS = [
   {id:'entrance',icon:'🚪',color:'si-purple',title:'ВХОД',items:[
     'Все напитки / снеки / чипсы выставлены',
@@ -424,7 +506,6 @@ const NIGHT_SECTIONS = [
   ]},
 ];
 
-// 14 зон закрытия смены
 const CLOSING_ZONES = [
   {id:'holod',    icon:'❄️',  label:'Холодильники'},
   {id:'musor_k',  icon:'🗑️', label:'Мусорка у кулера'},
@@ -439,75 +520,63 @@ const CLOSING_ZONES = [
   {id:'wc2',      icon:'🚻', label:'Туалет 2'},
   {id:'wc3',      icon:'🚻', label:'Туалет 3'},
   {id:'wc4',      icon:'🚻', label:'Туалет 4'},
-  {id:'terminal', icon:'🖨️', label:'Чек закрытия смены на терминале'},
+  {id:'terminal', icon:'🖨️', label:'Чек на терминале'},
 ];
 
-// STATE
+// ── STATE ──
 let shiftType = null;
-let checkState = {}; // {secId_itemIdx: bool}
+let checkState = {};
 let taskState = {};
 let rating = null;
 let zonePhotos = {};
 let zonePhotoKey = null;
-let currentTab = 0;
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+id).classList.add('active');
   window.scrollTo(0,0);
-}
-
-function goBack(){
-  if(confirm('Выйти? Прогресс сохранится.')) showScreen('welcome');
+  if(id === 'hub') updateHubProgress();
 }
 
 function resetApp(){
-  shiftType=null; checkState={}; taskState={}; rating=null; zonePhotos={};
-  currentTab=0;
-  showScreen('welcome');
+  if(confirm('Выйти? Весь прогресс смены будет сброшен.')) {
+    shiftType=null; checkState={}; taskState={}; rating=null; zonePhotos={};
+    showScreen('welcome');
+  }
 }
 
 function startShift(type){
   shiftType = type;
   checkState = {}; taskState = {}; rating = null; zonePhotos = {};
-  currentTab = 0;
 
   const isDay = type === 'day';
-  document.getElementById('h-title').textContent = isDay ? 'Дневная смена' : 'Ночная смена';
-  document.getElementById('h-sub').textContent = isDay ? 'Утренний обход · пр. Героев, 31' : 'Вечерний обход · пр. Героев, 31';
-  const b = document.getElementById('h-badge');
+  document.getElementById('hub-title').textContent = isDay ? 'Дневная смена' : 'Ночная смена';
+  const b = document.getElementById('hub-badge');
   b.textContent = isDay ? 'ДЕНЬ' : 'НОЧЬ';
-  b.className = 'header-badge ' + (isDay ? 'badge-day' : 'badge-night');
-  document.getElementById('prog-bar-0').className = 'progress-fill ' + (isDay ? 'fill-day' : 'fill-night');
+  b.className = 'hub-badge ' + (isDay ? 'badge-day' : 'badge-night');
+  document.getElementById('hub-greeting-text').textContent = isDay ? '☀️ Начинаем день!' : '🌙 Начинаем ночь!';
 
-  const sb = document.getElementById('submit-btn');
-  sb.className = 'submit-btn ' + (isDay ? 'day' : 'night');
+  document.getElementById('prog-bar').className = 'progress-fill ' + (isDay ? 'fill-day' : 'fill-night');
+  document.getElementById('submit-btn').className = 'submit-btn ' + (isDay ? 'day' : 'night');
+  document.getElementById('cl-sub').textContent = (isDay ? 'Дневная' : 'Ночная') + ' смена · пр. Героев, 31';
+  document.getElementById('cl2-sub').textContent = isDay ? 'Закрытие 21:00–22:00' : 'Закрытие 09:00–10:00';
 
   renderChecklist();
   renderTasks();
   renderZoneGrid();
-  switchTab(0);
-  showScreen('main');
-  updateProgress();
+  showScreen('hub');
 }
 
-function switchTab(idx){
-  currentTab = idx;
-  document.querySelectorAll('.tab-pane').forEach((p,i)=>{
-    p.classList.toggle('active', i===idx);
-  });
-  const activeClass = shiftType==='night' ? 'active-night' : 'active';
-  document.querySelectorAll('.tab-item').forEach((t,i)=>{
-    t.className = 'tab-item' + (i===idx ? ' '+activeClass : '');
-  });
-  window.scrollTo(0,0);
+function openSection(name){
+  showScreen(name);
 }
 
+// ── CHECKLIST ──
 function renderChecklist(){
   const secs = shiftType==='day' ? DAY_SECTIONS : NIGHT_SECTIONS;
   const body = document.getElementById('checklist-body');
   body.innerHTML = '';
-  const dotsEl = document.getElementById('sec-dots-0');
+  const dotsEl = document.getElementById('sec-dots');
   dotsEl.innerHTML = secs.map((_,i)=>`<div class="sec-dot" id="dot-${i}"></div>`).join('');
 
   secs.forEach(sec=>{
@@ -526,39 +595,37 @@ function renderChecklist(){
     `;
     body.appendChild(block);
     const list = block.querySelector('#il-'+sec.id);
-    sec.items.forEach((text, ii)=>{
+    sec.items.forEach((text,ii)=>{
       const k = sec.id+'_'+ii;
-      if(!checkState[k]) checkState[k] = false;
-      list.appendChild(makeCheckItem(sec.id, ii, text));
+      if(checkState[k]===undefined) checkState[k]=false;
+      list.appendChild(makeCheckItem(sec.id,ii,text));
     });
   });
 }
 
-function makeCheckItem(secId, ii, text){
+function makeCheckItem(secId,ii,text){
   const k = secId+'_'+ii;
   const done = checkState[k];
   const el = document.createElement('div');
   el.id = 'ci-'+k;
-  el.className = 'check-item' + (done ? ' done' : '');
-  el.onclick = ()=>toggleItem(secId, ii);
+  el.className = 'check-item'+(done?' done':'');
+  el.onclick = ()=>toggleItem(secId,ii);
   el.innerHTML = `
     <div class="checkmark">${done?'✓':''}</div>
-    <div class="item-content">
-      <div class="item-text">${text}</div>
-    </div>`;
+    <div class="item-content"><div class="item-text">${text}</div></div>`;
   return el;
 }
 
-function toggleItem(secId, ii){
+function toggleItem(secId,ii){
   const k = secId+'_'+ii;
   checkState[k] = !checkState[k];
   const secs = shiftType==='day' ? DAY_SECTIONS : NIGHT_SECTIONS;
   const sec = secs.find(s=>s.id===secId);
-  document.getElementById('ci-'+k).replaceWith(makeCheckItem(secId, ii, sec.items[ii]));
-  updateProgress();
+  document.getElementById('ci-'+k).replaceWith(makeCheckItem(secId,ii,sec.items[ii]));
+  updateChecklistProgress();
 }
 
-function updateProgress(){
+function updateChecklistProgress(){
   const secs = shiftType==='day' ? DAY_SECTIONS : NIGHT_SECTIONS;
   let total=0, done=0;
   secs.forEach((sec,si)=>{
@@ -566,22 +633,23 @@ function updateProgress(){
     sec.items.forEach((_,ii)=>{ if(checkState[sec.id+'_'+ii]){done++;sd++;} total++; });
     const sp = document.getElementById('sp-'+sec.id);
     const sc = document.getElementById('sc-'+sec.id);
-    if(sp) sp.style.width = (sec.items.length ? sd/sec.items.length*100 : 0)+'%';
-    if(sc) sc.textContent = sd+'/'+sec.items.length;
+    if(sp) sp.style.width=(sec.items.length?sd/sec.items.length*100:0)+'%';
+    if(sc) sc.textContent=sd+'/'+sec.items.length;
     const dot = document.getElementById('dot-'+si);
-    if(dot) dot.className = 'sec-dot'+(sd===sec.items.length?' done':sd>0?' partial':'');
+    if(dot) dot.className='sec-dot'+(sd===sec.items.length?' done':sd>0?' partial':'');
   });
   const pct = total ? done/total*100 : 0;
-  document.getElementById('prog-bar-0').style.width = pct+'%';
-  document.getElementById('prog-count-0').textContent = done+' / '+total;
+  document.getElementById('prog-bar').style.width = pct+'%';
+  document.getElementById('prog-count').textContent = done+' / '+total;
 }
 
+// ── TASKS ──
 function renderTasks(){
   const dow = new Date().getDay();
   const dayName = DAYS[dow];
   const today = WEEKLY[dow] || [];
-  const body = document.getElementById('tasks-body');
-  body.innerHTML = `
+  document.getElementById('hub-tasks-desc').textContent = today.length ? `Сегодня ${dayName}: ${today.length} задач` : 'Нет задач на сегодня';
+  document.getElementById('tasks-body').innerHTML = `
     <div class="tasks-card">
       <div class="tasks-hdr"><span>📋</span><span>ЗАДАЧИ НА СМЕНУ</span><div class="day-pill">${dayName}</div></div>
       ${today.map((t,i)=>`
@@ -599,20 +667,18 @@ function toggleTask(i){
   const r = document.getElementById('tr-'+i);
   const c = document.getElementById('tc-'+i);
   if(taskState[i]){
-    r.classList.add('done');
-    c.textContent='✓';
+    r.classList.add('done'); c.textContent='✓';
     c.style.cssText='background:var(--green);border-color:var(--green);color:#fff;font-size:10px;font-weight:700';
   } else {
-    r.classList.remove('done');
-    c.textContent='';
-    c.style.cssText='';
+    r.classList.remove('done'); c.textContent=''; c.style.cssText='';
   }
 }
 
+// ── ZONE PHOTOS ──
 function renderZoneGrid(){
   document.getElementById('zone-grid').innerHTML = CLOSING_ZONES.map(z=>{
-    const photos = zonePhotos[z.id] || [];
-    const shot = photos.length > 0;
+    const photos = zonePhotos[z.id]||[];
+    const shot = photos.length>0;
     return `<div class="zone-btn${shot?' shot':''}" onclick="openZonePhoto('${z.id}')">
       ${shot?`<div class="zone-count">${photos.length}</div>`:''}
       <span class="zone-icon">${z.icon}</span>
@@ -641,108 +707,126 @@ function handleZonePhoto(inp){
   inp.value='';
 }
 
+// ── HUB PROGRESS ──
+function updateHubProgress(){
+  const secs = shiftType==='day' ? DAY_SECTIONS : NIGHT_SECTIONS;
+  const total = secs.reduce((a,s)=>a+s.items.length,0);
+  const done = Object.values(checkState).filter(Boolean).length;
+  const pct = total ? done/total*100 : 0;
+  document.getElementById('hub-prog-checklist').style.width = pct+'%';
+  document.getElementById('hub-label-checklist').textContent = done+' / '+total;
+  const d1 = document.getElementById('dot-checklist');
+  d1.className = 'menu-status-dot '+(done===total && total>0 ? 'dot-done' : done>0 ? 'dot-partial' : 'dot-empty');
+
+  const dow = new Date().getDay();
+  const todayTasks = WEEKLY[dow]||[];
+  const doneTasks = Object.values(taskState).filter(Boolean).length;
+  const totalTasks = todayTasks.length;
+  const tpct = totalTasks ? doneTasks/totalTasks*100 : 100;
+  document.getElementById('hub-prog-tasks').style.width = tpct+'%';
+  document.getElementById('hub-label-tasks').textContent = doneTasks+' / '+totalTasks;
+  const d2 = document.getElementById('dot-tasks');
+  d2.className = 'menu-status-dot '+(doneTasks===totalTasks ? 'dot-done' : doneTasks>0 ? 'dot-partial' : 'dot-empty');
+
+  const zonesDone = CLOSING_ZONES.filter(z=>(zonePhotos[z.id]||[]).length>0).length;
+  const zpct = zonesDone/CLOSING_ZONES.length*100;
+  document.getElementById('hub-prog-closing').style.width = zpct+'%';
+  document.getElementById('hub-label-closing').textContent = zonesDone+' / '+CLOSING_ZONES.length;
+  const d3 = document.getElementById('dot-closing');
+  d3.className = 'menu-status-dot '+(zonesDone===CLOSING_ZONES.length ? 'dot-done' : zonesDone>0 ? 'dot-partial' : 'dot-empty');
+}
+
+// ── RATING ──
 function setRating(r){
   rating = r;
   ['good','ok','bad'].forEach(x=>{
     const el = document.getElementById('rb-'+x);
-    if(el) el.className = 'rb'+(r===x?' '+x:'');
+    if(el) el.className='rb'+(r===x?' '+x:'');
   });
 }
 
+// ── SUBMIT ──
 function base64ToBlob(base64){
-  const [header,data] = base64.split(',');
-  const mime = header.match(/:(.*?);/)[1];
-  const binary = atob(data);
-  const arr = new Uint8Array(binary.length);
+  const [header,data]=base64.split(',');
+  const mime=header.match(/:(.*?);/)[1];
+  const binary=atob(data);
+  const arr=new Uint8Array(binary.length);
   for(let i=0;i<binary.length;i++) arr[i]=binary.charCodeAt(i);
   return new Blob([arr],{type:mime});
 }
 
 async function uploadZonePhotos(){
-  const allPhotos = [];
-  CLOSING_ZONES.forEach(z=>{
-    (zonePhotos[z.id]||[]).forEach(photo=>allPhotos.push(photo));
-  });
+  const allPhotos=[];
+  CLOSING_ZONES.forEach(z=>{ (zonePhotos[z.id]||[]).forEach(p=>allPhotos.push(p)); });
   if(!allPhotos.length) return 0;
-
-  const chunks = [];
+  const chunks=[];
   for(let i=0;i<allPhotos.length;i+=10) chunks.push(allPhotos.slice(i,i+10));
-
-  let sent = 0;
+  let sent=0;
   for(const chunk of chunks){
     try{
-      const fd = new FormData();
-      fd.append('chat_id', REPORT_CHAT_ID_JS);
-      const mediaArr = chunk.map((_,i)=>({type:'photo',media:`attach://photo${i}`}));
-      fd.append('media', JSON.stringify(mediaArr));
-      chunk.forEach((photo,i)=>fd.append(`photo${i}`, base64ToBlob(photo), `photo${i}.jpg`));
-      const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup`,{method:'POST',body:fd});
-      if(res.ok) sent += chunk.length;
-    } catch(e){ console.error('Album upload failed',e); }
+      const fd=new FormData();
+      fd.append('chat_id',REPORT_CHAT_ID_JS);
+      const mediaArr=chunk.map((_,i)=>({type:'photo',media:`attach://photo${i}`}));
+      fd.append('media',JSON.stringify(mediaArr));
+      chunk.forEach((photo,i)=>fd.append(`photo${i}`,base64ToBlob(photo),`photo${i}.jpg`));
+      const res=await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup`,{method:'POST',body:fd});
+      if(res.ok) sent+=chunk.length;
+    }catch(e){ console.error(e); }
   }
   return sent;
 }
 
 async function submitShift(){
-  const sb = document.getElementById('submit-btn');
-  sb.disabled = true;
+  const sb=document.getElementById('submit-btn');
+  sb.disabled=true;
+  const secs=shiftType==='day'?DAY_SECTIONS:NIGHT_SECTIONS;
+  const total=secs.reduce((a,s)=>a+s.items.length,0);
+  const done=Object.values(checkState).filter(Boolean).length;
+  const zonesDone=CLOSING_ZONES.filter(z=>(zonePhotos[z.id]||[]).length>0).length;
+  const zonePhotosCount=Object.values(zonePhotos).reduce((a,p)=>a+p.length,0);
+  const now=new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const isDay=shiftType==='day';
+  const cash=document.getElementById('h-cash')?.value||'';
+  const next=document.getElementById('h-next')?.value||'';
+  const notes=document.getElementById('h-notes')?.value||'';
+  const ratingMap={good:'😎 Отлично',ok:'😐 Нормально',bad:'😤 Тяжело'};
+  const dow=new Date().getDay();
+  const todayTasks=WEEKLY[dow]||[];
+  const doneTasks=Object.values(taskState).filter(Boolean).length;
+  const totalTasks=todayTasks.length;
+  const incompleteTasks=todayTasks.filter((_,i)=>!taskState[i]);
 
-  const secs = shiftType==='day' ? DAY_SECTIONS : NIGHT_SECTIONS;
-  const total = secs.reduce((a,s)=>a+s.items.length, 0);
-  const done = Object.values(checkState).filter(Boolean).length;
-  const zonePhotosCount = Object.values(zonePhotos).reduce((a,p)=>a+p.length, 0);
+  const payload={shift:shiftType,datetime:now,checklist:{done,total},tasks:{done:doneTasks,total:totalTasks,incomplete:incompleteTasks},handover:{next,cash,rating,notes},photos_total:zonePhotosCount};
 
-  const now = new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  const isDay = shiftType === 'day';
-  const cash = document.getElementById('h-cash')?.value || '';
-  const next = document.getElementById('h-next')?.value || '';
-  const notes = document.getElementById('h-notes')?.value || '';
-  const ratingMap = {good:'😎 Отлично',ok:'😐 Нормально',bad:'😤 Тяжело'};
-  const dow = new Date().getDay();
-  const todayTasks = WEEKLY[dow] || [];
-  const doneTasks = Object.values(taskState).filter(Boolean).length;
-  const totalTasks = todayTasks.length;
-  const incompleteTasks = todayTasks.filter((_,i)=>!taskState[i]);
-
-  const payload = {
-    shift:shiftType, datetime:now,
-    checklist:{done,total},
-    tasks:{done:doneTasks,total:totalTasks,incomplete:incompleteTasks},
-    handover:{next,cash,rating,notes},
-    photos_total:zonePhotosCount,
-  };
-
-  if(zonePhotosCount > 0){
-    sb.innerHTML = '<span>📸</span><span>Отправляем фото...</span>';
+  if(zonePhotosCount>0){
+    sb.innerHTML='<span>📸</span><span>Отправляем фото...</span>';
     await uploadZonePhotos();
   }
+  sb.innerHTML='<span>⏳</span><span>Отправляем отчёт...</span>';
 
-  sb.innerHTML = '<span>⏳</span><span>Отправляем отчёт...</span>';
-
-  document.getElementById('done-title').textContent = isDay ? '✅ Дневная смена сдана!' : '✅ Ночная смена сдана!';
-  document.getElementById('done-sub').textContent = 'Отчёт отправлен управляющему. ' + (isDay ? 'Хорошего вечера! 🌆' : 'Хорошего отдыха! 😴');
-  document.getElementById('done-stats').innerHTML = `
+  document.getElementById('done-title').textContent=isDay?'✅ Дневная смена сдана!':'✅ Ночная смена сдана!';
+  document.getElementById('done-sub').textContent='Отчёт отправлен управляющему. '+(isDay?'Хорошего вечера! 🌆':'Хорошего отдыха! 😴');
+  document.getElementById('done-stats').innerHTML=`
     <div class="stat-row"><span class="stat-label">Дата и время</span><span class="stat-val">${now}</span></div>
     <div class="stat-row"><span class="stat-label">Смена</span><span class="stat-val">${isDay?'Дневная 🌅':'Ночная 🌙'}</span></div>
     <div class="stat-row"><span class="stat-label">Принятие смены</span><span class="stat-val" style="color:var(--green)">✅ ${done} / ${total}</span></div>
     <div class="stat-row"><span class="stat-label">Задачи</span><span class="stat-val" style="color:${doneTasks===totalTasks?'var(--green)':'var(--amber)'}">${doneTasks} / ${totalTasks}${doneTasks<totalTasks?' ⚠️':' ✅'}</span></div>
     ${incompleteTasks.length?`<div class="stat-row"><span class="stat-label" style="color:var(--amber)">Не выполнено</span><span class="stat-val" style="font-size:12px;color:var(--amber)">${incompleteTasks.join(', ')}</span></div>`:''}
-    <div class="stat-row"><span class="stat-label">Фото зон</span><span class="stat-val">${zonePhotosCount}</span></div>
+    <div class="stat-row"><span class="stat-label">Зоны сфоткано</span><span class="stat-val">${zonesDone} / ${CLOSING_ZONES.length}</span></div>
+    <div class="stat-row"><span class="stat-label">Фото всего</span><span class="stat-val">${zonePhotosCount}</span></div>
     <div class="stat-row"><span class="stat-label">Касса</span><span class="stat-val">${cash||'—'} ₽</span></div>
     <div class="stat-row"><span class="stat-label">Принимает смену</span><span class="stat-val">${next||'—'}</span></div>
     <div class="stat-row"><span class="stat-label">Оценка смены</span><span class="stat-val">${rating?ratingMap[rating]:'—'}</span></div>
     ${notes?`<div class="stat-row"><span class="stat-label">Заметки</span><span class="stat-val">${notes}</span></div>`:''}
   `;
-
   showScreen('done');
   if(tg) tg.sendData(JSON.stringify(payload));
 }
 
 function showToast(msg){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2000);
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
 }
 </script>
 </body>

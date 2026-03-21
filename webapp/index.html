@@ -91,6 +91,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .item-text{font-size:13.5px;line-height:1.5;color:var(--text)}
 .photo-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--cyan);background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.2);border-radius:4px;padding:2px 7px;margin-top:5px;cursor:pointer;user-select:none}
 .photo-badge.has{color:var(--green);background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.25)}
+.photo-item{border-left:3px solid var(--cyan)}
+.photo-item.done{border-left-color:var(--green);background:rgba(16,185,129,0.04)}
+.photo-item.done .item-text{color:var(--text3)}
+.cam-icon{font-size:22px;flex-shrink:0;margin-top:1px;width:28px;text-align:center}
+.cam-hint{font-size:11px;color:var(--cyan);margin-top:3px}
+.photo-item.done .cam-hint{color:var(--green)}
 .photo-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .photo-wrap{position:relative;display:inline-block}
 .photo-thumb{width:56px;height:56px;border-radius:7px;object-fit:cover;border:1px solid rgba(255,255,255,0.1);display:block}
@@ -151,27 +157,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .restart-btn{width:100%;max-width:360px;padding:15px;border:none;border-radius:var(--r);background:linear-gradient(135deg,var(--purple),var(--cyan));font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:0.5px;box-shadow:0 4px 20px rgba(124,58,237,0.3);transition:all 0.2s}
 .restart-btn:active{transform:scale(0.98)}
 
-/* MENU */
-.menu-header{padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
-.menu-cards{padding:16px;display:flex;flex-direction:column;gap:12px}
-.menu-card{background:var(--card);border-radius:16px;padding:20px;cursor:pointer;transition:all 0.2s;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:16px;user-select:none}
-.menu-card:active{transform:scale(0.97)}
-.menu-card-icon{width:50px;height:50px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
-.mc-checklist .menu-card-icon{background:rgba(124,58,237,0.2)}
-.mc-tasks .menu-card-icon{background:rgba(245,158,11,0.15)}
-.mc-closing .menu-card-icon{background:rgba(6,182,212,0.15)}
-.menu-card-info{flex:1;min-width:0}
-.menu-card-title{font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:0.3px;margin-bottom:3px}
-.mc-checklist .menu-card-title{color:var(--purple2)}
-.mc-tasks .menu-card-title{color:var(--amber)}
-.mc-closing .menu-card-title{color:var(--cyan)}
-.menu-card-desc{font-size:12px;color:var(--text3);line-height:1.4;margin-bottom:6px}
-.menu-pill{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;display:inline-block}
-.mp-purple{background:rgba(124,58,237,0.2);color:var(--purple2)}
-.mp-amber{background:rgba(245,158,11,0.15);color:var(--amber)}
-.mp-cyan{background:rgba(6,182,212,0.15);color:var(--cyan)}
-.menu-arrow{color:var(--text3);font-size:22px;flex-shrink:0}
-
 /* TOAST */
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;z-index:9999;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
 .toast.show{transform:translateX(-50%) translateY(0)}
@@ -203,52 +188,10 @@ input[type=file]{display:none}
   </div>
 </div>
 
-<!-- MENU -->
-<div class="screen" id="screen-menu">
-  <div class="menu-header">
-    <div class="back-btn" onclick="goBackToWelcome()">←</div>
-    <div class="header-logo">CS</div>
-    <div class="header-info">
-      <h1 id="menu-title">Дневная смена</h1>
-      <p id="menu-sub">пр. Героев, 31</p>
-    </div>
-    <div class="header-badge badge-day" id="menu-badge-shift">ДЕНЬ</div>
-  </div>
-  <div class="menu-cards">
-    <div class="menu-card mc-checklist" onclick="openChecklist()">
-      <div class="menu-card-icon">✅</div>
-      <div class="menu-card-info">
-        <div class="menu-card-title">Чеклист принятия смены</div>
-        <div class="menu-card-desc">Обход помещений — вход, бар, зал, туалеты, VIP</div>
-        <div class="menu-pill mp-purple" id="mp-checklist">0 / 0</div>
-      </div>
-      <div class="menu-arrow">›</div>
-    </div>
-    <div class="menu-card mc-tasks" onclick="openTasks()">
-      <div class="menu-card-icon">📋</div>
-      <div class="menu-card-info">
-        <div class="menu-card-title">Задачи на смену</div>
-        <div class="menu-card-desc">Еженедельные задачи на сегодня</div>
-        <div class="menu-pill mp-amber" id="mp-tasks">0 / 0</div>
-      </div>
-      <div class="menu-arrow">›</div>
-    </div>
-    <div class="menu-card mc-closing" onclick="openClosing()">
-      <div class="menu-card-icon">🤝</div>
-      <div class="menu-card-info">
-        <div class="menu-card-title">Закрытие смены</div>
-        <div class="menu-card-desc">Передача смены, касса, оценка и отправка отчёта</div>
-        <div class="menu-pill mp-cyan">Заполнить и отправить</div>
-      </div>
-      <div class="menu-arrow">›</div>
-    </div>
-  </div>
-</div>
-
 <!-- CHECKLIST -->
 <div class="screen" id="screen-checklist">
   <div class="app-header">
-    <div class="back-btn" onclick="goBackToMenu()">←</div>
+    <div class="back-btn" onclick="goBack()">←</div>
     <div class="header-logo">CS</div>
     <div class="header-info">
       <h1 id="h-title">Дневная смена</h1>
@@ -265,36 +208,8 @@ input[type=file]{display:none}
     <div class="sec-dots" id="sec-dots"></div>
   </div>
   <div class="scroll-body" id="scroll-body"></div>
-</div>
-
-<!-- TASKS -->
-<div class="screen" id="screen-tasks">
-  <div class="app-header">
-    <div class="back-btn" onclick="goBackToMenu()">←</div>
-    <div class="header-logo">CS</div>
-    <div class="header-info">
-      <h1>Задачи на смену</h1>
-      <p id="tasks-sub">пр. Героев, 31</p>
-    </div>
-    <div class="header-badge badge-day" id="tasks-badge">ДЕНЬ</div>
-  </div>
-  <div id="tasks-body" style="padding:16px 0 120px"></div>
-</div>
-
-<!-- CLOSING -->
-<div class="screen" id="screen-closing">
-  <div class="app-header">
-    <div class="back-btn" onclick="goBackToMenu()">←</div>
-    <div class="header-logo">CS</div>
-    <div class="header-info">
-      <h1>Закрытие смены</h1>
-      <p id="closing-sub">пр. Героев, 31</p>
-    </div>
-    <div class="header-badge badge-day" id="closing-badge">ДЕНЬ</div>
-  </div>
-  <div class="scroll-body" id="closing-body"></div>
   <div class="submit-wrap">
-    <button class="submit-btn day" id="submit-btn" onclick="submitShift()">
+    <button class="submit-btn day" id="submit-btn" onclick="submitShift()" disabled>
       <span>✅</span><span id="sub-label">Завершить и отправить отчёт</span><span class="sub-prog" id="sub-prog"></span>
     </button>
   </div>
@@ -339,25 +254,25 @@ const WEEKLY = {
 const DAY = [
   {id:'entrance',icon:'🚪',color:'si-purple',title:'ВХОД',items:[
     {t:'Все напитки / снеки / чипсы выставлены',p:false},
-    {t:'Холодильник чистый, нет разводов, окна не запотевшие',p:false},
+    {t:'Холодильник чистый, нет разводов, окна не запотевшие',p:true},
     {t:'Телевизор работает (выведены ценники)',p:false},
     {t:'Микроволновка чистая внутри (нет крошек, тарелка чистая) и снаружи (нет пыли и грязи)',p:false},
     {t:'Стойка чистая — нет сахара, остатков еды, липких разводов',p:false},
     {t:'Чай / сахар / вода в кулере есть',p:false},
     {t:'Слив кулера пустой, на крышке нет пыли',p:false},
-    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:false},
+    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:true},
   ]},
   {id:'bar',icon:'💨',color:'si-amber',title:'БАРНАЯ СТОЙКА',items:[
     {t:'Вытяжка выключена',p:false},
     {t:'Барная стойка чистая — все три уровня: нет крошек, следов еды, липких разводов',p:false},
     {t:'У угля ничего не стоит (кроме самого угля)',p:false},
     {t:'Под углём ничего не лежит',p:false},
-    {t:'Электропечь чистая — нет пепла, сажи, разводов; рядом тоже чисто',p:false},
+    {t:'Электропечь чистая — нет пепла, сажи, разводов; рядом тоже чисто',p:true},
     {t:'Кадило пустое — нет остатков табака, углей, пепла',p:false},
-    {t:'Кальяны собраны и чистые',p:false},
-    {t:'Раковина чистая внутри — ничего не лежит, нет грязи и остатков табака; рядом тоже порядок',p:false},
+    {t:'Кальяны собраны и чистые',p:true},
+    {t:'Раковина чистая внутри — ничего не лежит, нет грязи и остатков табака; рядом тоже порядок',p:true},
     {t:'Под раковиной нет мусора, остатков табака, пол чистый',p:false},
-    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:false},
+    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:true},
   ]},
   {id:'hall',icon:'🖥️',color:'si-cyan',title:'ОБЩИЙ ЗАЛ',items:[
     {t:'Стулья стоят ровно — максимально подняты, ручки опущены, у каждого есть подушка',p:false},
@@ -375,7 +290,7 @@ const DAY = [
     {t:'На зеркале нет разводов',p:false},
     {t:'Раковина чистая',p:false},
     {t:'Туалет чистый — нет коричневой полосы у слива',p:false},
-    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:false},
+    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:true},
   ]},
   {id:'vip',icon:'👑',color:'si-purple',title:'ВИП ЗАЛ',items:[
     {t:'Стулья стоят ровно — максимально подняты, ручки опущены, у каждого есть подушка',p:false},
@@ -386,27 +301,27 @@ const DAY = [
     {t:'Мониторы подняты и стоят ±на одном уровне',p:false},
     {t:'Коврики сухие, нет крошек и остатков еды',p:false},
     {t:'Кондиционер выключен',p:false},
-    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:false},
+    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:true},
   ]},
 ];
 
 const NIGHT = [
   {id:'entrance',icon:'🚪',color:'si-cyan',title:'ВХОД',items:[
     {t:'Все напитки / снеки / чипсы выставлены',p:false},
-    {t:'Холодильник чистый, нет разводов, окна не запотевшие',p:false},
+    {t:'Холодильник чистый, нет разводов, окна не запотевшие',p:true},
     {t:'Телевизор работает (выведены ценники)',p:false},
     {t:'Стойка чистая — нет сахара, остатков еды, липких разводов',p:false},
     {t:'Чай / сахар / вода в кулере есть',p:false},
-    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:false},
+    {t:'Мусорка поменяна, за мусоркой нет бутылок и грязи',p:true},
   ]},
   {id:'bar',icon:'💨',color:'si-amber',title:'БАРНАЯ СТОЙКА',items:[
     {t:'Вытяжка в рабочем состоянии',p:false},
     {t:'Барная стойка чистая — все три уровня',p:false},
-    {t:'Электропечь чистая — нет пепла, сажи, разводов; рядом тоже чисто',p:false},
+    {t:'Электропечь чистая — нет пепла, сажи, разводов; рядом тоже чисто',p:true},
     {t:'Кадило пустое — нет остатков табака, углей, пепла',p:false},
-    {t:'Кальяны собраны и чистые',p:false},
-    {t:'Раковина чистая, рядом порядок',p:false},
-    {t:'Мусорка поменяна',p:false},
+    {t:'Кальяны собраны и чистые',p:true},
+    {t:'Раковина чистая, рядом порядок',p:true},
+    {t:'Мусорка поменяна',p:true},
   ]},
   {id:'hall',icon:'🖥️',color:'si-purple',title:'ОБЩИЙ ЗАЛ',items:[
     {t:'Стулья стоят ровно, у каждого есть подушка',p:false},
@@ -421,7 +336,7 @@ const NIGHT = [
     {t:'Бумажные полотенца есть',p:false},
     {t:'Раковина чистая',p:false},
     {t:'Туалет чистый',p:false},
-    {t:'Мусорка поменяна',p:false},
+    {t:'Мусорка поменяна',p:true},
   ]},
   {id:'vip',icon:'👑',color:'si-cyan',title:'ВИП ЗАЛ',items:[
     {t:'Стулья стоят ровно, у каждого есть подушка',p:false},
@@ -429,120 +344,34 @@ const NIGHT = [
     {t:'Мышки стоят на месте, чистые',p:false},
     {t:'Клавиатуры в порядке',p:false},
     {t:'Коврики сухие',p:false},
-    {t:'Мусорка поменяна',p:false},
+    {t:'Мусорка поменяна',p:true},
   ]},
 ];
 
-const CLOSING_ITEMS = [
-  'Бар','Мусорка у кулера','Мусорка у кальянов','Раковина','Плитка','Кальяны',
-  'Мусорка в Prime','Мусорка в VIP 2','Мусорка в VIP 3',
-  'Туалет 1','Туалет 2','Туалет 3','Туалет 4','Чек о закрытии смены',
-];
-
 // STATE
-let shiftType=null, state={}, taskState={}, closingCheckState={}, rating=null;
+let shiftType=null, state={}, taskState={}, rating=null;
 function key(sid,ii){return sid+'_'+ii}
 let photoKey=null;
-let tasksRendered=false, closingRendered=false;
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+id).classList.add('active');
   window.scrollTo(0,0);
 }
-function goBackToWelcome(){if(confirm('Выйти? Прогресс сохранится.'))showScreen('welcome')}
-function goBackToMenu(){showScreen('menu');updateMenuBadges();}
-function resetApp(){shiftType=null;state={};taskState={};closingCheckState={};rating=null;tasksRendered=false;closingRendered=false;showScreen('welcome')}
+function goBack(){if(confirm('Выйти? Прогресс этой вкладки сохранится.'))showScreen('welcome')}
+function resetApp(){shiftType=null;state={};taskState={};rating=null;showScreen('welcome')}
 
 function startShift(type){
-  shiftType=type; state={}; taskState={}; closingCheckState={}; rating=null;
-  tasksRendered=false; closingRendered=false;
+  shiftType=type; state={}; taskState={}; rating=null;
   const isDay=type==='day';
-
-  // Меню
-  document.getElementById('menu-title').textContent=isDay?'Дневная смена':'Ночная смена';
-  const mb=document.getElementById('menu-badge-shift');
-  mb.textContent=isDay?'ДЕНЬ':'НОЧЬ';
-  mb.className='header-badge '+(isDay?'badge-day':'badge-night');
-
-  // Чеклист
   document.getElementById('h-title').textContent=isDay?'Дневная смена':'Ночная смена';
   document.getElementById('h-sub').textContent=isDay?'Утренний обход · пр. Героев, 31':'Вечерний обход · пр. Героев, 31';
   const b=document.getElementById('h-badge');
   b.textContent=isDay?'ДЕНЬ':'НОЧЬ';
   b.className='header-badge '+(isDay?'badge-day':'badge-night');
   document.getElementById('prog-bar').className='progress-fill '+(isDay?'fill-day':'fill-night');
-
-  renderBody(); updateProgress(); updateMenuBadges();
-  showScreen('menu');
-}
-
-function openChecklist(){showScreen('checklist');}
-
-function openTasks(){
-  const isDay=shiftType==='day';
-  const tb=document.getElementById('tasks-badge');
-  tb.textContent=isDay?'ДЕНЬ':'НОЧЬ';
-  tb.className='header-badge '+(isDay?'badge-day':'badge-night');
-  if(!tasksRendered){
-    const body=document.getElementById('tasks-body');
-    body.innerHTML='';
-    body.appendChild(makeTasksBlock());
-    tasksRendered=true;
-  }
-  showScreen('tasks');
-}
-
-function openClosing(){
-  const isDay=shiftType==='day';
-  const cb=document.getElementById('closing-badge');
-  cb.textContent=isDay?'ДЕНЬ':'НОЧЬ';
-  cb.className='header-badge '+(isDay?'badge-day':'badge-night');
   document.getElementById('submit-btn').className='submit-btn '+(isDay?'day':'night');
-  if(!closingRendered){
-    const body=document.getElementById('closing-body');
-    body.innerHTML='';
-    body.appendChild(makeClosingChecklist());
-    body.appendChild(makeHandover());
-    closingRendered=true;
-  }
-  showScreen('closing');
-}
-
-function makeClosingChecklist(){
-  const wrap=document.createElement('div');
-  wrap.className='tasks-card';
-  wrap.style.margin='12px 16px';
-  wrap.innerHTML=`<div class="tasks-hdr"><span>🔒</span><span>ЗАКРЫТИЕ СМЕНЫ</span></div>`;
-  CLOSING_ITEMS.forEach((t,i)=>{
-    const row=document.createElement('div');
-    row.className='task-row';
-    row.id='cr-'+i;
-    row.innerHTML=`<div class="task-chk" id="cc-${i}"></div><div class="task-text">${t}</div>`;
-    row.onclick=()=>{
-      closingCheckState[i]=!closingCheckState[i];
-      row.classList.toggle('done',!!closingCheckState[i]);
-      const chk=document.getElementById('cc-'+i);
-      if(closingCheckState[i]){chk.textContent='✓';chk.style.cssText='background:var(--green);border-color:var(--green);color:#fff;font-size:10px;font-weight:700'}
-      else{chk.textContent='';chk.style.cssText=''}
-    };
-    wrap.appendChild(row);
-  });
-  return wrap;
-}
-
-function updateMenuBadges(){
-  if(!shiftType) return;
-  const secs=shiftType==='day'?DAY:NIGHT;
-  const total=secs.reduce((a,s)=>a+s.items.length,0);
-  const done=Object.values(state).filter(s=>s.done).length;
-  const mp=document.getElementById('mp-checklist');
-  if(mp) mp.textContent=done+' / '+total;
-  const dow=new Date().getDay();
-  const todayTasks=WEEKLY[dow]||[];
-  const doneTasks=Object.values(taskState).filter(Boolean).length;
-  const mpt=document.getElementById('mp-tasks');
-  if(mpt) mpt.textContent=doneTasks+' / '+todayTasks.length;
+  renderBody(); showScreen('checklist'); updateProgress();
 }
 
 function renderBody(){
@@ -572,33 +401,41 @@ function renderBody(){
       list.appendChild(makeItem(sec.id,ii,item));
     });
   });
+  body.appendChild(makeTasksBlock());
+  body.appendChild(makeHandover());
 }
 
 function makeItem(sid,ii,item){
   const k=key(sid,ii);
   const s=state[k];
   const el=document.createElement('div');
-  el.className='check-item'+(s.done?' done':'');
   el.id='ci-'+k;
-  el.onclick=()=>toggleItem(sid,ii);
-  let photoPart='';
+
   if(item.p){
-    const has=s.photos.length>0;
-    photoPart=`<div class="photo-badge${has?' has':''}" onclick="event.stopPropagation();openPhoto('${k}')">
-      ${has?'✅ '+s.photos.length+' фото':'📷 Прикрепить фото'}
-    </div>`;
-    if(has){
-      photoPart+=`<div class="photo-row">${s.photos.map((p,pi)=>
-        `<div class="photo-wrap"><img class="photo-thumb" src="${p}"><div class="photo-rm" onclick="event.stopPropagation();rmPhoto('${k}',${pi})">✕</div></div>`
-      ).join('')}</div>`;
-    }
+    // Фото-пункт: нажатие = открыть камеру
+    const hasPhoto=s.photos.length>0;
+    el.className='check-item photo-item'+(hasPhoto?' done':'');
+    el.onclick=()=>openPhoto(k);
+    const thumbs=hasPhoto?`<div class="photo-row">${s.photos.map((p,pi)=>
+      `<div class="photo-wrap"><img class="photo-thumb" src="${p}"><div class="photo-rm" onclick="event.stopPropagation();rmPhoto('${k}',${pi})">✕</div></div>`
+    ).join('')}</div>`:'';
+    el.innerHTML=`
+      <div class="cam-icon">${hasPhoto?'✅':'📷'}</div>
+      <div class="item-content">
+        <div class="item-text">${item.t}</div>
+        <div class="cam-hint">${hasPhoto?s.photos.length+' фото · нажми ещё раз чтобы добавить':'Нажми чтобы сфотографировать'}</div>
+        ${thumbs}
+      </div>`;
+  } else {
+    // Обычный чек-пункт: нажатие = галочка
+    el.className='check-item'+(s.done?' done':'');
+    el.onclick=()=>toggleItem(sid,ii);
+    el.innerHTML=`
+      <div class="checkmark">${s.done?'✓':''}</div>
+      <div class="item-content">
+        <div class="item-text">${item.t}</div>
+      </div>`;
   }
-  el.innerHTML=`
-    <div class="checkmark">${s.done?'✓':''}</div>
-    <div class="item-content">
-      <div class="item-text">${item.t}</div>
-      ${photoPart}
-    </div>`;
   return el;
 }
 
@@ -618,12 +455,14 @@ function handlePhoto(inp){
     const r=new FileReader();
     r.onload=e=>{
       state[photoKey].photos.push(e.target.result);
+      state[photoKey].done=true; // фото сделано = пункт выполнен
       const [sid,iis]=photoKey.split('_');
       const ii=parseInt(iis);
       const secs=shiftType==='day'?DAY:NIGHT;
       const sec=secs.find(s=>s.id===sid);
       document.getElementById('ci-'+photoKey).replaceWith(makeItem(sid,ii,sec.items[ii]));
       showToast('📷 Фото добавлено');
+      updateProgress();
     };
     r.readAsDataURL(f);
   });
@@ -631,11 +470,13 @@ function handlePhoto(inp){
 }
 function rmPhoto(k,pi){
   state[k].photos.splice(pi,1);
+  if(state[k].photos.length===0) state[k].done=false; // убрал все фото = не выполнен
   const [sid,iis]=k.split('_');
   const ii=parseInt(iis);
   const secs=shiftType==='day'?DAY:NIGHT;
   const sec=secs.find(s=>s.id===sid);
   document.getElementById('ci-'+k).replaceWith(makeItem(sid,ii,sec.items[ii]));
+  updateProgress();
 }
 
 function makeTasksBlock(){
@@ -728,7 +569,6 @@ function updateProgress(){
   // TODO: вернуть обязательное заполнение после тестов
   sb.disabled = false;
   sp2.textContent = done < total ? `обход: ${done}/${total}` : '';
-  updateMenuBadges();
 }
 
 function base64ToBlob(base64){
@@ -797,14 +637,10 @@ async function submitShift(){
     if(missed.length) unchecked[sec.title]=missed;
   });
 
-  const closingDone=Object.values(closingCheckState).filter(Boolean).length;
-  const closingUnchecked=CLOSING_ITEMS.filter((_,i)=>!closingCheckState[i]);
-
   const payload={
     shift:shiftType, datetime:now,
     checklist:{done,total},
     tasks:{done:doneTasks,total:totalTasks,incomplete:incompleteTasks},
-    closing:{done:closingDone,total:CLOSING_ITEMS.length,unchecked:closingUnchecked},
     handover:{next,cash,rating,notes},
     unchecked, photos_total:photos,
   };

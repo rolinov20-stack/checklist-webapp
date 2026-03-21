@@ -134,14 +134,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .rb.bad{background:rgba(239,68,68,0.15);border-color:var(--red);color:var(--red)}
 
 /* SUBMIT */
-.submit-wrap{position:fixed;bottom:0;left:0;right:0;padding:12px 16px 20px;background:linear-gradient(transparent,var(--bg) 35%)}
+.submit-wrap{padding:16px 16px 32px}
 .submit-btn{width:100%;padding:15px;border:none;border-radius:var(--r);font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:0.5px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
 .submit-btn.day{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;box-shadow:0 4px 20px rgba(124,58,237,0.35)}
 .submit-btn.night{background:linear-gradient(135deg,#0e7490,var(--cyan));color:#000;box-shadow:0 4px 20px rgba(6,182,212,0.25)}
 .submit-btn:disabled{opacity:0.4;cursor:not-allowed;box-shadow:none}
 .submit-btn:active:not(:disabled){transform:scale(0.98)}
 .sub-prog{font-size:12px;opacity:0.7}
-.scroll-body{padding-bottom:120px}
+.scroll-body{padding-bottom:24px}
 
 /* DONE */
 .done-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;background:radial-gradient(ellipse at 50% 30%,rgba(16,185,129,0.12) 0%,transparent 60%),var(--bg)}
@@ -208,11 +208,6 @@ input[type=file]{display:none}
     <div class="sec-dots" id="sec-dots"></div>
   </div>
   <div class="scroll-body" id="scroll-body"></div>
-  <div class="submit-wrap">
-    <button class="submit-btn day" id="submit-btn" onclick="submitShift()" disabled>
-      <span>✅</span><span id="sub-label">Завершить и отправить отчёт</span><span class="sub-prog" id="sub-prog"></span>
-    </button>
-  </div>
 </div>
 
 <!-- DONE -->
@@ -370,7 +365,6 @@ function startShift(type){
   b.textContent=isDay?'ДЕНЬ':'НОЧЬ';
   b.className='header-badge '+(isDay?'badge-day':'badge-night');
   document.getElementById('prog-bar').className='progress-fill '+(isDay?'fill-day':'fill-night');
-  document.getElementById('submit-btn').className='submit-btn '+(isDay?'day':'night');
   renderBody(); showScreen('checklist'); updateProgress();
 }
 
@@ -507,11 +501,12 @@ function toggleTask(i){
 
 function makeHandover(){
   const isDay=shiftType==='day';
-  const label=isDay?'ПЕРЕДАЧА СМЕНЫ (21:00 – 22:00)':'ПЕРЕДАЧА СМЕНЫ (09:00 – 10:00)';
+  const label=isDay?'ЗАКРЫТИЕ СМЕНЫ (21:00 – 22:00)':'ЗАКРЫТИЕ СМЕНЫ (09:00 – 10:00)';
+  const btnClass='submit-btn '+(isDay?'day':'night');
   const wrap=document.createElement('div');
   wrap.innerHTML=`
     <div class="handover-card">
-      <div class="handover-hdr"><span>🤝</span><span>${label}</span></div>
+      <div class="handover-hdr"><span>🔒</span><span>${label}</span></div>
       <div class="handover-body">
         <div>
           <div class="fl">Кому передаю смену</div>
@@ -537,6 +532,11 @@ function makeHandover(){
           <textarea class="fi" id="h-notes" rows="3" placeholder="Что важно знать следующей смене: поломки, конфликты, нехватка товара..."></textarea>
         </div>
       </div>
+    </div>
+    <div class="submit-wrap">
+      <button class="${btnClass}" id="submit-btn" onclick="submitShift()">
+        <span>✅</span><span>Завершить и отправить отчёт</span><span class="sub-prog" id="sub-prog"></span>
+      </button>
     </div>`;
   return wrap;
 }
@@ -564,11 +564,8 @@ function updateProgress(){
   const pct=total?done/total*100:0;
   document.getElementById('prog-bar').style.width=pct+'%';
   document.getElementById('prog-count').textContent=done+' / '+total;
-  const sb=document.getElementById('submit-btn');
   const sp2=document.getElementById('sub-prog');
-  // TODO: вернуть обязательное заполнение после тестов
-  sb.disabled = false;
-  sp2.textContent = done < total ? `обход: ${done}/${total}` : '';
+  if(sp2) sp2.textContent = done < total ? `обход: ${done}/${total}` : '';
 }
 
 function base64ToBlob(base64){

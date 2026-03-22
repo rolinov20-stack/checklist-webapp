@@ -201,6 +201,40 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;z-index:9999;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 input[type=file]{display:none}
+/* FINANCIAL TABLE */
+.fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.fin-cat{background:var(--card2);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 10px 8px}
+.fin-cat-name{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:8px}
+.fin-row{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:5px}
+.fin-row span{font-size:11px;color:var(--text3);flex-shrink:0;width:42px}
+.fin-inp{padding:6px 8px!important;font-size:13px!important;text-align:right}
+.fin-total-row{border-top:1px solid rgba(255,255,255,0.06);padding-top:5px;margin-top:3px}
+.fin-total-row span:first-child{color:var(--text2)}
+.fin-total-val{font-size:13px;font-weight:600;color:var(--green)}
+.fin-summary{background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:12px 14px;margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.fin-sum-row{display:flex;justify-content:space-between;align-items:center}
+.fin-sum-row span:first-child{font-size:13px;color:var(--text2)}
+.fin-sum-val{font-size:14px;font-weight:600;color:var(--green)}
+.fin-sum-big .fin-sum-val{font-size:16px;color:var(--cyan)}
+.fin-sum-big span:first-child{font-size:13px;font-weight:600;color:var(--text)}
+
+/* FINANCIAL TABLE */
+.fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+.fin-cat{background:var(--card2);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 10px 8px}
+.fin-cat-name{font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--cyan);margin-bottom:8px}
+.fin-row{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:5px}
+.fin-row span{font-size:11px;color:var(--text3);flex-shrink:0;width:42px}
+.fin-inp{padding:6px 8px!important;font-size:13px!important;text-align:right}
+.fin-total-row{border-top:1px solid rgba(255,255,255,0.06);padding-top:5px;margin-top:3px}
+.fin-total-row span:first-child{color:var(--text2)}
+.fin-total-val{font-size:13px;font-weight:600;color:var(--green)}
+.fin-summary{background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:12px 14px;margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.fin-sum-row{display:flex;justify-content:space-between;align-items:center}
+.fin-sum-row span:first-child{font-size:13px;color:var(--text2)}
+.fin-sum-val{font-size:14px;font-weight:600;color:var(--green)}
+.fin-sum-big .fin-sum-val{font-size:16px;color:var(--cyan)}
+.fin-sum-big span:first-child{font-size:13px;font-weight:600;color:var(--text)}
+
 .scroll-body{padding-bottom:24px}
 </style>
 </head>
@@ -353,19 +387,86 @@ input[type=file]{display:none}
     <div style="font-size:12px;color:var(--text2)">Нажми на зону чтобы сфотографировать</div>
   </div>
   <div class="zone-grid" id="zone-grid"></div>
-  <div class="handover-card">
-    <div class="handover-hdr"><span>📋</span><span>ПЕРЕДАЧА СМЕНЫ</span></div>
+      <div class="handover-card">
+    <div class="handover-hdr"><span>📊</span><span>ФИНАНСОВЫЙ ОТЧЁТ</span></div>
     <div class="handover-body">
+
+      <div>
+        <div class="fl">Имя сотрудника</div>
+        <input class="fi" id="h-name" type="text" placeholder="Ваше имя">
+      </div>
+
+      <div>
+        <div class="fl">Выручка по категориям</div>
+        <div class="fin-grid">
+          <div class="fin-cat">
+            <div class="fin-cat-name">💻 Компы</div>
+            <div class="fin-row"><span>Нал</span><input class="fi fin-inp" id="f-pc-nal" type="number" placeholder="0" inputmode="numeric" oninput="calcTotals()"></div>
+            <div class="fin-row"><span>Безнал</span><input class="fi fin-inp" id="f-pc-bn" type="number" placeholder="0" inputmode="numeric" oninput="calcTotals()"></div>
+            <div class="fin-row fin-total-row"><span>Итого</span><span class="fin-total-val" id="ft-pc">0</span></div>
+          </div>
+          <div class="fin-cat">
+            <div class="fin-cat-name">🎮 Приставки</div>
+            <div class="fin-row"><span>Нал</span><input class="fi fin-inp" id="f-ps-nal" type="number" placeholder="0" inputmode="numeric" oninput="calcTotals()"></div>
+            <div class="fin-row"><span>Безнал</span><input class="fi fin-inp" id="f-ps-bn" type="number" placeholder="0" inputmode="numeric" oninput="calcTotals()"></div>
+            <div class="fin-row fin-total-row"><span>Итого</span><span class="fin-total-val" id="ft-ps">0</span></div>
+          </div>
+          <div class="fin-cat">
+            <div class="fin-cat-name">🍔 Бар</div>
+            <div class="fin-row"><span>Нал</span><input class="fi fin-inp" id="f-bar-nal" type="number" placeholder="0" inputmode="numeric" oninput="calcTotals()"></div>
+            <div class="fin-row"><span>Безнал</span><input class="fi fin-inp" id="f-bar-bn" type="number" placeholder="0" inputmode="numeric" oninput="calcTotals()"></div>
+            <div class="fin-row fin-total-row"><span>Итого</span><span class="fin-total-val" id="ft-bar">0</span></div>
+          </div>
+          <div class="fin-cat">
+            <div class="fin-cat-name">📦 Прочее</div>
+            <div class="fin-row"><span>Нал</span><input class="fi fin-inp" id="f-other-nal" type="number" placeholder="0" inputmode="numeric" oninput="calcTotals()"></div>
+            <div class="fin-row"><span>Безнал</span><input class="fi fin-inp" id="f-other-bn" type="number" placeholder="0" inputmode="numeric" oninput="calcTotals()"></div>
+            <div class="fin-row fin-total-row"><span>Итого</span><span class="fin-total-val" id="ft-other">0</span></div>
+          </div>
+          <div class="fin-cat">
+            <div class="fin-cat-name">💨 Кальян</div>
+            <div class="fin-row"><span>Нал</span><input class="fi fin-inp" id="f-kal-nal" type="number" placeholder="0" inputmode="numeric" oninput="calcTotals()"></div>
+            <div class="fin-row"><span>Безнал</span><input class="fi fin-inp" id="f-kal-bn" type="number" placeholder="0" inputmode="numeric" oninput="calcTotals()"></div>
+            <div class="fin-row fin-total-row"><span>Итого</span><span class="fin-total-val" id="ft-kal">0</span></div>
+          </div>
+          <div class="fin-cat">
+            <div class="fin-cat-name">⭐ Prime</div>
+            <div class="fin-row"><span>Нал</span><input class="fi fin-inp" id="f-prime-nal" type="number" placeholder="0" inputmode="numeric" oninput="calcTotals()"></div>
+            <div class="fin-row"><span>Безнал</span><input class="fi fin-inp" id="f-prime-bn" type="number" placeholder="0" inputmode="numeric" oninput="calcTotals()"></div>
+            <div class="fin-row fin-total-row"><span>Итого</span><span class="fin-total-val" id="ft-prime">0</span></div>
+          </div>
+        </div>
+        <div class="fin-summary">
+          <div class="fin-sum-row"><span>💵 Итого нал</span><span class="fin-sum-val" id="sum-nal">0 ₽</span></div>
+          <div class="fin-sum-row"><span>💳 Итого безнал</span><span class="fin-sum-val" id="sum-bn">0 ₽</span></div>
+          <div class="fin-sum-row fin-sum-big"><span>📊 Общая выручка</span><span class="fin-sum-val" id="sum-total">0 ₽</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="fl">Наличность на начало смены</div>
+        <div class="cash-row"><input class="fi" id="h-cash-start" type="number" placeholder="0" inputmode="numeric"><span class="cash-sym">₽</span></div>
+      </div>
+      <div>
+        <div class="fl">Переводы до смены</div>
+        <div class="cash-row"><input class="fi" id="h-transfer-pre" type="number" placeholder="0" inputmode="numeric"><span class="cash-sym">₽</span></div>
+      </div>
+      <div>
+        <div class="fl">Переводы на смене</div>
+        <div class="cash-row"><input class="fi" id="h-transfer-on" type="number" placeholder="0" inputmode="numeric"><span class="cash-sym">₽</span></div>
+      </div>
+      <div>
+        <div class="fl">На карте итого</div>
+        <div class="cash-row"><input class="fi" id="h-card" type="number" placeholder="0" inputmode="numeric"><span class="cash-sym">₽</span></div>
+      </div>
+      <div>
+        <div class="fl">Наличность на конец смены (фактически)</div>
+        <div class="cash-row"><input class="fi" id="h-cash-end" type="number" placeholder="0" inputmode="numeric"><span class="cash-sym">₽</span></div>
+      </div>
+
       <div>
         <div class="fl">Кому передаю смену</div>
         <input class="fi" id="h-next" type="text" placeholder="Имя следующего администратора">
-      </div>
-      <div>
-        <div class="fl">Сумма в кассе</div>
-        <div class="cash-row">
-          <input class="fi" id="h-cash" type="number" placeholder="0" inputmode="numeric">
-          <span class="cash-sym">₽</span>
-        </div>
       </div>
       <div>
         <div class="fl">Оцени смену</div>
@@ -379,6 +480,7 @@ input[type=file]{display:none}
         <div class="fl">Заметки / инциденты / поломки</div>
         <textarea class="fi" id="h-notes" rows="3" placeholder="Что важно знать следующей смене: поломки, конфликты, нехватка товара..."></textarea>
       </div>
+
     </div>
   </div>
   <div class="submit-wrap">
@@ -865,6 +967,52 @@ async function uploadZonePhotos(){
   return sent;
 }
 
+
+function calcTotals(){
+  const g=id=>parseFloat(document.getElementById(id)?.value)||0;
+  const cats=[
+    {id:'pc',   nal:g('f-pc-nal'),    bn:g('f-pc-bn')},
+    {id:'ps',   nal:g('f-ps-nal'),    bn:g('f-ps-bn')},
+    {id:'bar',  nal:g('f-bar-nal'),   bn:g('f-bar-bn')},
+    {id:'other',nal:g('f-other-nal'), bn:g('f-other-bn')},
+    {id:'kal',  nal:g('f-kal-nal'),   bn:g('f-kal-bn')},
+    {id:'prime',nal:g('f-prime-nal'), bn:g('f-prime-bn')},
+  ];
+  let totalNal=0, totalBn=0;
+  cats.forEach(c=>{
+    const t=c.nal+c.bn;
+    const el=document.getElementById('ft-'+c.id);
+    if(el) el.textContent=t.toLocaleString('ru-RU');
+    totalNal+=c.nal; totalBn+=c.bn;
+  });
+  document.getElementById('sum-nal').textContent=totalNal.toLocaleString('ru-RU')+' ₽';
+  document.getElementById('sum-bn').textContent=totalBn.toLocaleString('ru-RU')+' ₽';
+  document.getElementById('sum-total').textContent=(totalNal+totalBn).toLocaleString('ru-RU')+' ₽';
+}
+
+
+function calcTotals(){
+  const g=id=>parseFloat(document.getElementById(id)?.value)||0;
+  const cats=[
+    {id:'pc',   nal:g('f-pc-nal'),    bn:g('f-pc-bn')},
+    {id:'ps',   nal:g('f-ps-nal'),    bn:g('f-ps-bn')},
+    {id:'bar',  nal:g('f-bar-nal'),   bn:g('f-bar-bn')},
+    {id:'other',nal:g('f-other-nal'), bn:g('f-other-bn')},
+    {id:'kal',  nal:g('f-kal-nal'),   bn:g('f-kal-bn')},
+    {id:'prime',nal:g('f-prime-nal'), bn:g('f-prime-bn')},
+  ];
+  let totalNal=0, totalBn=0;
+  cats.forEach(c=>{
+    const t=c.nal+c.bn;
+    const el=document.getElementById('ft-'+c.id);
+    if(el) el.textContent=t.toLocaleString('ru-RU');
+    totalNal+=c.nal; totalBn+=c.bn;
+  });
+  document.getElementById('sum-nal').textContent=totalNal.toLocaleString('ru-RU')+' ₽';
+  document.getElementById('sum-bn').textContent=totalBn.toLocaleString('ru-RU')+' ₽';
+  document.getElementById('sum-total').textContent=(totalNal+totalBn).toLocaleString('ru-RU')+' ₽';
+}
+
 async function submitShift(){
   const sb=document.getElementById('submit-btn');
   sb.disabled=true;
@@ -875,7 +1023,24 @@ async function submitShift(){
   const zonePhotosCount=Object.values(zonePhotos).reduce((a,p)=>a+p.length,0);
   const now=new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
   const isDay=shiftType==='day';
-  const cash=document.getElementById('h-cash')?.value||'';
+  const employeeName=document.getElementById('h-name')?.value||'';
+  const gv=id=>parseFloat(document.getElementById(id)?.value)||0;
+  const fin={
+    pc:   {nal:gv('f-pc-nal'),   bn:gv('f-pc-bn')},
+    ps:   {nal:gv('f-ps-nal'),   bn:gv('f-ps-bn')},
+    bar:  {nal:gv('f-bar-nal'),  bn:gv('f-bar-bn')},
+    other:{nal:gv('f-other-nal'),bn:gv('f-other-bn')},
+    kal:  {nal:gv('f-kal-nal'),  bn:gv('f-kal-bn')},
+    prime:{nal:gv('f-prime-nal'),bn:gv('f-prime-bn')},
+    cash_start:   gv('h-cash-start'),
+    transfer_pre: gv('h-transfer-pre'),
+    transfer_on:  gv('h-transfer-on'),
+    card_total:   gv('h-card'),
+    cash_end:     gv('h-cash-end'),
+  };
+  const totalNal=[fin.pc,fin.ps,fin.bar,fin.other,fin.kal,fin.prime].reduce((a,c)=>a+c.nal,0);
+  const totalBn= [fin.pc,fin.ps,fin.bar,fin.other,fin.kal,fin.prime].reduce((a,c)=>a+c.bn,0);
+  fin.total_nal=totalNal; fin.total_bn=totalBn; fin.total=totalNal+totalBn;
   const next=document.getElementById('h-next')?.value||'';
   const notes=document.getElementById('h-notes')?.value||'';
   const ratingMap={good:'😎 Отлично',ok:'😐 Нормально',bad:'😤 Тяжело'};
@@ -885,7 +1050,7 @@ async function submitShift(){
   const totalTasks=todayTasks.length;
   const incompleteTasks=todayTasks.filter((_,i)=>!taskState[i]);
 
-  const payload={shift:shiftType,datetime:now,checklist:{done,total},tasks:{done:doneTasks,total:totalTasks,incomplete:incompleteTasks},handover:{next,cash,rating,notes},photos_total:zonePhotosCount};
+  const payload={shift:shiftType,datetime:now,employee:employeeName,checklist:{done,total},tasks:{done:doneTasks,total:totalTasks,incomplete:incompleteTasks},finance:fin,handover:{next,rating,notes},photos_total:zonePhotosCount};
 
   if(zonePhotosCount>0){
     sb.innerHTML='<span>📸</span><span>Отправляем фото...</span>';
@@ -901,9 +1066,11 @@ async function submitShift(){
     <div class="stat-row"><span class="stat-label">Принятие смены</span><span class="stat-val" style="color:var(--green)">✅ ${done} / ${total}</span></div>
     <div class="stat-row"><span class="stat-label">Задачи</span><span class="stat-val" style="color:${doneTasks===totalTasks?'var(--green)':'var(--amber)'}">${doneTasks} / ${totalTasks}${doneTasks<totalTasks?' ⚠️':' ✅'}</span></div>
     ${incompleteTasks.length?`<div class="stat-row"><span class="stat-label" style="color:var(--amber)">Не выполнено</span><span class="stat-val" style="font-size:12px;color:var(--amber)">${incompleteTasks.join(', ')}</span></div>`:''}
+    <div class="stat-row"><span class="stat-label">Сотрудник</span><span class="stat-val">${employeeName||'—'}</span></div>
     <div class="stat-row"><span class="stat-label">Зоны сфоткано</span><span class="stat-val">${zonesDone} / ${CLOSING_ZONES.length}</span></div>
-    <div class="stat-row"><span class="stat-label">Фото всего</span><span class="stat-val">${zonePhotosCount}</span></div>
-    <div class="stat-row"><span class="stat-label">Касса</span><span class="stat-val">${cash||'—'} ₽</span></div>
+    <div class="stat-row"><span class="stat-label">Выручка нал</span><span class="stat-val">${totalNal.toLocaleString('ru-RU')} ₽</span></div>
+    <div class="stat-row"><span class="stat-label">Выручка безнал</span><span class="stat-val">${totalBn.toLocaleString('ru-RU')} ₽</span></div>
+    <div class="stat-row"><span class="stat-label">Общая выручка</span><span class="stat-val" style="color:var(--cyan)">${(totalNal+totalBn).toLocaleString('ru-RU')} ₽</span></div>
     <div class="stat-row"><span class="stat-label">Принимает смену</span><span class="stat-val">${next||'—'}</span></div>
     <div class="stat-row"><span class="stat-label">Оценка смены</span><span class="stat-val">${rating?ratingMap[rating]:'—'}</span></div>
     ${notes?`<div class="stat-row"><span class="stat-label">Заметки</span><span class="stat-val">${notes}</span></div>`:''}

@@ -389,6 +389,8 @@ input[type=file]{display:none}
   </div>
 </div>
 
+<input type="file" id="zone-photo-input" accept="image/*" capture="environment" onchange="handleZonePhoto(this)">
+
 <!-- CAMERA MODAL -->
 <div class="cam-modal" id="cam-modal">
   <video class="cam-video" id="cam-video" autoplay playsinline muted></video>
@@ -775,17 +777,26 @@ function renderZoneGrid(){
 }
 
 let camStream = null;
-let camFacing = 'environment'; // задняя камера по умолчанию
+let camFacing = 'environment';
+
+// Проверяем поддержку getUserMedia (не работает в Android Telegram WebView)
+function hasGetUserMedia(){
+  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+}
 
 async function openZonePhoto(zoneId){
   zonePhotoKey = zoneId;
-  await startCamera();
+  if(hasGetUserMedia()){
+    await startCamera();
+  } else {
+    // Фолбэк для Android: нативная камера через file input
+    document.getElementById('zone-photo-input').click();
+  }
 }
 
 async function startCamera(){
   const modal = document.getElementById('cam-modal');
   const video = document.getElementById('cam-video');
-  // Останавливаем предыдущий стрим если был
   if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
   try {
     camStream = await navigator.mediaDevices.getUserMedia({
@@ -795,7 +806,8 @@ async function startCamera(){
     video.srcObject = camStream;
     modal.classList.add('open');
   } catch(e){
-    showToast('⚠️ Нет доступа к камере');
+    // getUserMedia не сработал — фолбэк на нативную камеру
+    document.getElementById('zone-photo-input').click();
   }
 }
 
@@ -822,6 +834,21 @@ function shootPhoto(){
   renderZoneGrid();
   saveState();
   showToast('📷 Зона сфоткана');
+}
+
+function handleZonePhoto(inp){
+  Array.from(inp.files).forEach(f=>{
+    const r = new FileReader();
+    r.onload = e=>{
+      if(!zonePhotos[zonePhotoKey]) zonePhotos[zonePhotoKey]=[];
+      zonePhotos[zonePhotoKey].push(e.target.result);
+      renderZoneGrid();
+      saveState();
+      showToast('📷 Зона сфоткана');
+    };
+    r.readAsDataURL(f);
+  });
+  inp.value='';
 }
 
 // ── HUB PROGRESS ──

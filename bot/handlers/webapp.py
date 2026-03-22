@@ -120,29 +120,25 @@ def _build_report(message: Message, d: dict) -> str:
     lines = [
         "📋 <b>ОТЧЁТ О СМЕНЕ — CYBER SPACE</b>",
         "",
-        f"👤 Сотрудник: {username} ({user.full_name})",
-        f"🕐 Время: {dt}",
-        f"🌐 Смена: {shift}",
+        f"👤 {username}",
+        f"🕐 {dt}  |  🌐 {shift}",
         "",
-        f"<b>Принятие смены:</b> {cl.get('done', 0)}/{cl.get('total', 0)} пунктов ✅",
     ]
 
-    if unchecked:
-        lines.append("")
-        lines.append("⚠️ <b>Не отмечено:</b>")
-        for section, items in unchecked.items():
-            lines.append(f"  <b>{section}:</b>")
-            for item in items:
-                lines.append(f"    • {item}")
+    done_tasks = tasks.get('done', 0)
+    total_tasks = tasks.get('total', 0)
+    if total_tasks > 0:
+        status = "✅" if done_tasks == total_tasks else "⚠️"
+        lines.append(f"{status} <b>Задачи дня:</b> {done_tasks}/{total_tasks}")
+        if tasks.get("incomplete"):
+            lines.append("")
+            lines.append("❌ <b>Не выполнено:</b>")
+            for t in tasks["incomplete"]:
+                lines.append(f"  • {t}")
+    else:
+        lines.append("📋 Задач на сегодня нет")
 
-    lines += [
-        "",
-        f"<b>Задачи дня:</b> {tasks.get('done', 0)}/{tasks.get('total', 0)}",
-    ]
-    if tasks.get("incomplete"):
-        lines.append("Не выполнено: " + ", ".join(tasks["incomplete"]))
-
-    lines += ["", f"📸 Фото зон: {photos_total}"]
+    lines += ["", f"📸 <b>Фото зон:</b> {photos_total}"]
 
     if notes:
         lines += ["", "📝 <b>Комментарий:</b>", notes]

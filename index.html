@@ -589,6 +589,8 @@ function clearState(){
   const saved = loadSavedState();
   if(!saved) return;
   const ago = Date.now() - saved.savedAt;
+  const MAX_AGE = 14 * 60 * 60 * 1000; // 14 часов
+  if(ago > MAX_AGE){ clearState(); return; } // смена устарела — удаляем
   const hours = Math.floor(ago / 3600000);
   const mins  = Math.floor((ago % 3600000) / 60000);
   const timeStr = hours > 0 ? `${hours} ч. ${mins} мин. назад` : `${mins} мин. назад`;

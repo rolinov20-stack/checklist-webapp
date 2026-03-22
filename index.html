@@ -214,6 +214,13 @@ input[type=file]{display:none}
     <div class="logo-wrap"><div class="logo-letters">CS</div></div>
     <div class="welcome-title">CYBER SPACE</div>
     <div class="welcome-sub">Система учёта смен · пр. Героев, 31</div>
+    <!-- Баннер продолжения сохранённой смены -->
+    <div id="continue-banner" style="display:none;width:100%;max-width:380px;margin-bottom:18px;background:rgba(16,185,129,0.1);border:1.5px solid rgba(16,185,129,0.35);border-radius:14px;padding:14px 16px;cursor:pointer" onclick="continueShift()">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--green);margin-bottom:3px">↩ Продолжить смену</div>
+      <div id="continue-label" style="font-size:12px;color:var(--text2)"></div>
+    </div>
+
+    <div style="font-size:11px;color:var(--text3);margin-bottom:14px;text-align:center">или начать новую:</div>
     <div class="shift-cards">
       <div class="shift-card day" onclick="startShift('day')">
         <span class="shift-icon">🌅</span>
@@ -531,6 +538,76 @@ let rating = null;
 let zonePhotos = {};
 let zonePhotoKey = null;
 
+// ── PERSISTENCE ──
+const STORE_KEY = 'cs_shift_v1';
+const STORE_PHOTOS = 'cs_photos_v1';
+
+function saveState(){
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      shiftType, checkState, taskState, rating, savedAt: Date.now()
+    }));
+  } catch(e){}
+  try {
+    localStorage.setItem(STORE_PHOTOS, JSON.stringify(zonePhotos));
+  } catch(e){
+    // фото слишком большие — сохраняем без них
+  }
+}
+
+function loadSavedState(){
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if(!raw) return null;
+    const d = JSON.parse(raw);
+    if(!d.shiftType) return null;
+    return d;
+  } catch(e){ return null; }
+}
+
+function restoreState(d){
+  shiftType = d.shiftType;
+  checkState = d.checkState || {};
+  taskState  = d.taskState  || {};
+  rating     = d.rating     || null;
+  try {
+    const p = localStorage.getItem(STORE_PHOTOS);
+    if(p) zonePhotos = JSON.parse(p);
+  } catch(e){}
+}
+
+function clearState(){
+  localStorage.removeItem(STORE_KEY);
+  localStorage.removeItem(STORE_PHOTOS);
+}
+
+// ── INIT: check for saved session ──
+(function init(){
+  const saved = loadSavedState();
+  if(!saved) return;
+  const ago = Date.now() - saved.savedAt;
+  const hours = Math.floor(ago / 3600000);
+  const mins  = Math.floor((ago % 3600000) / 60000);
+  const timeStr = hours > 0 ? `${hours} ч. ${mins} мин. назад` : `${mins} мин. назад`;
+  const shiftLabel = saved.shiftType === 'day' ? '☀️ Дневная' : '🌙 Ночная';
+  const banner = document.getElementById('continue-banner');
+  document.getElementById('continue-label').textContent = `${shiftLabel} смена · сохранено ${timeStr}`;
+  banner.style.display = 'block';
+})();
+
+function continueShift(){
+  const saved = loadSavedState();
+  if(!saved) return;
+  restoreState(saved);
+  applyShiftUI();
+  renderChecklist();
+  renderTasks();
+  renderZoneGrid();
+  // restore rating buttons
+  if(rating) setRating(rating);
+  showScreen('hub');
+}
+
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-'+id).classList.add('active');
@@ -540,30 +617,33 @@ function showScreen(id){
 
 function resetApp(){
   if(confirm('Выйти? Весь прогресс смены будет сброшен.')) {
+    clearState();
     shiftType=null; checkState={}; taskState={}; rating=null; zonePhotos={};
     showScreen('welcome');
   }
 }
 
-function startShift(type){
-  shiftType = type;
-  checkState = {}; taskState = {}; rating = null; zonePhotos = {};
-
-  const isDay = type === 'day';
+function applyShiftUI(){
+  const isDay = shiftType === 'day';
   document.getElementById('hub-title').textContent = isDay ? 'Дневная смена' : 'Ночная смена';
   const b = document.getElementById('hub-badge');
   b.textContent = isDay ? 'ДЕНЬ' : 'НОЧЬ';
   b.className = 'hub-badge ' + (isDay ? 'badge-day' : 'badge-night');
   document.getElementById('hub-greeting-text').textContent = isDay ? '☀️ Начинаем день!' : '🌙 Начинаем ночь!';
-
   document.getElementById('prog-bar').className = 'progress-fill ' + (isDay ? 'fill-day' : 'fill-night');
   document.getElementById('submit-btn').className = 'submit-btn ' + (isDay ? 'day' : 'night');
   document.getElementById('cl-sub').textContent = (isDay ? 'Дневная' : 'Ночная') + ' смена · пр. Героев, 31';
   document.getElementById('cl2-sub').textContent = isDay ? 'Закрытие 21:00–22:00' : 'Закрытие 09:00–10:00';
+}
 
+function startShift(type){
+  shiftType = type;
+  checkState = {}; taskState = {}; rating = null; zonePhotos = {};
+  applyShiftUI();
   renderChecklist();
   renderTasks();
   renderZoneGrid();
+  saveState();
   showScreen('hub');
 }
 
@@ -623,6 +703,7 @@ function toggleItem(secId,ii){
   const sec = secs.find(s=>s.id===secId);
   document.getElementById('ci-'+k).replaceWith(makeCheckItem(secId,ii,sec.items[ii]));
   updateChecklistProgress();
+  saveState();
 }
 
 function updateChecklistProgress(){
@@ -672,6 +753,7 @@ function toggleTask(i){
   } else {
     r.classList.remove('done'); c.textContent=''; c.style.cssText='';
   }
+  saveState();
 }
 
 // ── ZONE PHOTOS ──
@@ -700,6 +782,7 @@ function handleZonePhoto(inp){
       if(!zonePhotos[zonePhotoKey]) zonePhotos[zonePhotoKey]=[];
       zonePhotos[zonePhotoKey].push(e.target.result);
       renderZoneGrid();
+      saveState();
       showToast('📷 Зона сфоткана');
     };
     r.readAsDataURL(f);
@@ -743,6 +826,7 @@ function setRating(r){
     const el = document.getElementById('rb-'+x);
     if(el) el.className='rb'+(r===x?' '+x:'');
   });
+  saveState();
 }
 
 // ── SUBMIT ──
@@ -819,6 +903,7 @@ async function submitShift(){
     <div class="stat-row"><span class="stat-label">Оценка смены</span><span class="stat-val">${rating?ratingMap[rating]:'—'}</span></div>
     ${notes?`<div class="stat-row"><span class="stat-label">Заметки</span><span class="stat-val">${notes}</span></div>`:''}
   `;
+  clearState();
   showScreen('done');
   if(tg) tg.sendData(JSON.stringify(payload));
 }

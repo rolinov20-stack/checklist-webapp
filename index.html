@@ -201,6 +201,16 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;z-index:9999;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,0.4)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 input[type=file]{display:none}
+/* CAMERA MODAL */
+.cam-modal{position:fixed;inset:0;z-index:5000;background:#000;display:none;flex-direction:column}
+.cam-modal.open{display:flex}
+.cam-video{flex:1;width:100%;object-fit:cover}
+.cam-bar{background:rgba(0,0,0,0.8);padding:16px 24px 32px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-shrink:0}
+.cam-close{width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cam-shoot{width:70px;height:70px;border-radius:50%;border:4px solid #fff;background:rgba(255,255,255,0.15);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.cam-shoot:active{transform:scale(0.92);background:rgba(255,255,255,0.4)}
+.cam-shoot-inner{width:54px;height:54px;border-radius:50%;background:#fff}
+.cam-flip{width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .scroll-body{padding-bottom:24px}
 </style>
 </head>
@@ -379,7 +389,16 @@ input[type=file]{display:none}
   </div>
 </div>
 
-<input type="file" id="zone-photo-input" accept="image/*" capture="environment" onchange="handleZonePhoto(this)">
+<!-- CAMERA MODAL -->
+<div class="cam-modal" id="cam-modal">
+  <video class="cam-video" id="cam-video" autoplay playsinline muted></video>
+  <canvas id="cam-canvas" style="display:none"></canvas>
+  <div class="cam-bar">
+    <div class="cam-close" onclick="closeCamera()">✕</div>
+    <div class="cam-shoot" onclick="shootPhoto()"><div class="cam-shoot-inner"></div></div>
+    <div class="cam-flip" onclick="flipCamera()">🔄</div>
+  </div>
+</div>
 
 <script>
 const tg = window.Telegram?.WebApp;
@@ -755,24 +774,54 @@ function renderZoneGrid(){
   }).join('');
 }
 
-function openZonePhoto(zoneId){
+let camStream = null;
+let camFacing = 'environment'; // задняя камера по умолчанию
+
+async function openZonePhoto(zoneId){
   zonePhotoKey = zoneId;
-  document.getElementById('zone-photo-input').click();
+  await startCamera();
 }
 
-function handleZonePhoto(inp){
-  Array.from(inp.files).forEach(f=>{
-    const r = new FileReader();
-    r.onload = e=>{
-      if(!zonePhotos[zonePhotoKey]) zonePhotos[zonePhotoKey]=[];
-      zonePhotos[zonePhotoKey].push(e.target.result);
-      renderZoneGrid();
-      saveState();
-      showToast('📷 Зона сфоткана');
-    };
-    r.readAsDataURL(f);
-  });
-  inp.value='';
+async function startCamera(){
+  const modal = document.getElementById('cam-modal');
+  const video = document.getElementById('cam-video');
+  // Останавливаем предыдущий стрим если был
+  if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
+  try {
+    camStream = await navigator.mediaDevices.getUserMedia({
+      video:{ facingMode: camFacing, width:{ideal:1920}, height:{ideal:1080} },
+      audio: false
+    });
+    video.srcObject = camStream;
+    modal.classList.add('open');
+  } catch(e){
+    showToast('⚠️ Нет доступа к камере');
+  }
+}
+
+function closeCamera(){
+  if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream=null; }
+  document.getElementById('cam-modal').classList.remove('open');
+}
+
+function flipCamera(){
+  camFacing = camFacing === 'environment' ? 'user' : 'environment';
+  startCamera();
+}
+
+function shootPhoto(){
+  const video = document.getElementById('cam-video');
+  const canvas = document.getElementById('cam-canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  if(!zonePhotos[zonePhotoKey]) zonePhotos[zonePhotoKey]=[];
+  zonePhotos[zonePhotoKey].push(dataUrl);
+  closeCamera();
+  renderZoneGrid();
+  saveState();
+  showToast('📷 Зона сфоткана');
 }
 
 // ── HUB PROGRESS ──

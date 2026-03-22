@@ -110,8 +110,7 @@ def _build_report(message: Message, d: dict) -> str:
     dt = d.get("datetime", "—")
     cl = d.get("checklist", {})
     tasks = d.get("tasks", {})
-    h = d.get("handover", {})
-    unchecked = d.get("unchecked", {})
+    notes = d.get("notes", "")
     photos_total = d.get("photos_total", 0)
 
     user = message.from_user
@@ -125,32 +124,14 @@ def _build_report(message: Message, d: dict) -> str:
         f"🌐 Смена: {shift}",
         "",
         f"<b>Обход:</b> {cl.get('done', 0)}/{cl.get('total', 0)} пунктов ✅",
-    ]
-
-    if unchecked:
-        lines.append("")
-        lines.append("⚠️ <b>Не отмечено:</b>")
-        for section, items in unchecked.items():
-            lines.append(f"  <b>{section}:</b>")
-            for item in items:
-                lines.append(f"    • {item}")
-
-    lines += [
-        "",
         f"<b>Задачи дня:</b> {tasks.get('done', 0)}/{tasks.get('total', 0)}",
     ]
     if tasks.get("incomplete"):
         lines.append("Не выполнено: " + ", ".join(tasks["incomplete"]))
 
-    lines += [
-        "",
-        f"📸 Фото: {photos_total}",
-        f"💵 Касса: {h.get('cash') or '—'} ₽",
-        f"🤝 Принимает: {h.get('next') or '—'}",
-        f"⭐ Оценка: {RATING_MAP.get(h.get('rating', ''), '—')}",
-    ]
+    lines += ["", f"📸 Фото: {photos_total}"]
 
-    if h.get("notes"):
-        lines += ["", "📝 <b>Заметки:</b>", h["notes"]]
+    if notes:
+        lines += ["", "📝 <b>Комментарий:</b>", notes]
 
     return "\n".join(lines)

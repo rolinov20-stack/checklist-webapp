@@ -354,30 +354,10 @@ input[type=file]{display:none}
   </div>
   <div class="zone-grid" id="zone-grid"></div>
   <div class="handover-card">
-    <div class="handover-hdr"><span>📋</span><span>ПЕРЕДАЧА СМЕНЫ</span></div>
+    <div class="handover-hdr"><span>📝</span><span>КОММЕНТАРИЙ К СМЕНЕ</span></div>
     <div class="handover-body">
       <div>
-        <div class="fl">Кому передаю смену</div>
-        <input class="fi" id="h-next" type="text" placeholder="Имя следующего администратора">
-      </div>
-      <div>
-        <div class="fl">Сумма в кассе</div>
-        <div class="cash-row">
-          <input class="fi" id="h-cash" type="number" placeholder="0" inputmode="numeric">
-          <span class="cash-sym">₽</span>
-        </div>
-      </div>
-      <div>
-        <div class="fl">Оцени смену</div>
-        <div class="rating-grid">
-          <div class="rb" id="rb-good" onclick="setRating('good')"><span class="rb-emoji">😎</span>Отлично</div>
-          <div class="rb" id="rb-ok"   onclick="setRating('ok')"><span class="rb-emoji">😐</span>Нормально</div>
-          <div class="rb" id="rb-bad"  onclick="setRating('bad')"><span class="rb-emoji">😤</span>Тяжело</div>
-        </div>
-      </div>
-      <div>
-        <div class="fl">Заметки / инциденты / поломки</div>
-        <textarea class="fi" id="h-notes" rows="3" placeholder="Что важно знать следующей смене: поломки, конфликты, нехватка товара..."></textarea>
+        <textarea class="fi" id="h-notes" rows="5" placeholder="Что важно знать следующей смене: поломки, конфликты, нехватка товара..."></textarea>
       </div>
     </div>
   </div>
@@ -875,17 +855,14 @@ async function submitShift(){
   const zonePhotosCount=Object.values(zonePhotos).reduce((a,p)=>a+p.length,0);
   const now=new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
   const isDay=shiftType==='day';
-  const cash=document.getElementById('h-cash')?.value||'';
-  const next=document.getElementById('h-next')?.value||'';
   const notes=document.getElementById('h-notes')?.value||'';
-  const ratingMap={good:'😎 Отлично',ok:'😐 Нормально',bad:'😤 Тяжело'};
   const dow=new Date().getDay();
   const todayTasks=WEEKLY[dow]||[];
   const doneTasks=Object.values(taskState).filter(Boolean).length;
   const totalTasks=todayTasks.length;
   const incompleteTasks=todayTasks.filter((_,i)=>!taskState[i]);
 
-  const payload={shift:shiftType,datetime:now,checklist:{done,total},tasks:{done:doneTasks,total:totalTasks,incomplete:incompleteTasks},handover:{next,cash,rating,notes},photos_total:zonePhotosCount};
+  const payload={shift:shiftType,datetime:now,checklist:{done,total},tasks:{done:doneTasks,total:totalTasks,incomplete:incompleteTasks},notes,photos_total:zonePhotosCount};
 
   if(zonePhotosCount>0){
     sb.innerHTML='<span>📸</span><span>Отправляем фото...</span>';
@@ -903,10 +880,7 @@ async function submitShift(){
     ${incompleteTasks.length?`<div class="stat-row"><span class="stat-label" style="color:var(--amber)">Не выполнено</span><span class="stat-val" style="font-size:12px;color:var(--amber)">${incompleteTasks.join(', ')}</span></div>`:''}
     <div class="stat-row"><span class="stat-label">Зоны сфоткано</span><span class="stat-val">${zonesDone} / ${CLOSING_ZONES.length}</span></div>
     <div class="stat-row"><span class="stat-label">Фото всего</span><span class="stat-val">${zonePhotosCount}</span></div>
-    <div class="stat-row"><span class="stat-label">Касса</span><span class="stat-val">${cash||'—'} ₽</span></div>
-    <div class="stat-row"><span class="stat-label">Принимает смену</span><span class="stat-val">${next||'—'}</span></div>
-    <div class="stat-row"><span class="stat-label">Оценка смены</span><span class="stat-val">${rating?ratingMap[rating]:'—'}</span></div>
-    ${notes?`<div class="stat-row"><span class="stat-label">Заметки</span><span class="stat-val">${notes}</span></div>`:''}
+    ${notes?`<div class="stat-row"><span class="stat-label">Комментарий</span><span class="stat-val">${notes}</span></div>`:''}
   `;
   clearState();
   showScreen('done');

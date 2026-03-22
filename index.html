@@ -956,7 +956,13 @@ async function submitShift(){
   const totalTasks=todayTasks.length;
   const incompleteTasks=todayTasks.filter((_,i)=>!taskState[i]);
 
-  const payload={shift:shiftType,datetime:now,checklist:{done,total},tasks:{done:doneTasks,total:totalTasks,incomplete:incompleteTasks},notes,photos_total:zonePhotosCount};
+  const unchecked={};
+  secs.forEach(sec=>{
+    const missed=sec.items.filter((_,ii)=>!checkState[sec.id+'_'+ii]).map(t=>t);
+    if(missed.length) unchecked[sec.title]=missed;
+  });
+
+  const payload={shift:shiftType,datetime:now,checklist:{done,total},tasks:{done:doneTasks,total:totalTasks,incomplete:incompleteTasks},unchecked,notes,photos_total:zonePhotosCount};
 
   if(zonePhotosCount>0){
     sb.innerHTML='<span>📸</span><span>Отправляем фото...</span>';

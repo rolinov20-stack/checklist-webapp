@@ -105,96 +105,47 @@ async def finish_photos(message: Message, state: FSMContext) -> None:
     )
 
 
-def _fmt(val) -> str:
-    try:
-        return f"{int(val):,}".replace(",", " ")
-    except Exception:
-        return str(val or 0)
-
-
 def _build_report(message: Message, d: dict) -> str:
     shift = SHIFT_MAP.get(d.get("shift", ""), d.get("shift", "—"))
     dt = d.get("datetime", "—")
     cl = d.get("checklist", {})
     tasks = d.get("tasks", {})
     h = d.get("handover", {})
+    unchecked = d.get("unchecked", {})
     photos_total = d.get("photos_total", 0)
-    employee = d.get("employee", "")
-    fin = d.get("finance", {})
 
     user = message.from_user
-    tg_name = f"@{user.username}" if user.username else user.full_name
-    name_str = employee or tg_name
+    username = f"@{user.username}" if user.username else user.full_name
 
     lines = [
         "📋 <b>ОТЧЁТ О СМЕНЕ — CYBER SPACE</b>",
         "",
-        f"👤 Сотрудник: <b>{name_str}</b>",
-        f"🕐 Дата/время: {dt}",
+        f"👤 Сотрудник: {username} ({user.full_name})",
+        f"🕐 Время: {dt}",
         f"🌐 Смена: {shift}",
         "",
+        f"<b>Обход:</b> {cl.get('done', 0)}/{cl.get('total', 0)} пунктов ✅",
     ]
 
-    # ── Финансовая таблица ──
-    if fin:
-        cats = [
-            ("💻 Компы",      fin.get("pc",    {})),
-            ("🎮 Приставки",  fin.get("ps",    {})),
-            ("🍔 Бар",        fin.get("bar",   {})),
-            ("📦 Прочее",     fin.get("other", {})),
-            ("💨 Кальян",     fin.get("kal",   {})),
-            ("⭐ Prime",      fin.get("prime", {})),
-        ]
-        lines.append("💰 <b>ФИНАНСОВЫЙ ОТЧЁТ</b>")
+    if unchecked:
         lines.append("")
-
-        # Таблица по категориям
-        for cat_name, cat in cats:
-            nal = int(cat.get("nal", 0))
-            bn  = int(cat.get("bn",  0))
-            tot = nal + bn
-            if tot > 0:
-                lines.append(f"  <b>{cat_name}</b>")
-                lines.append(f"    Нал: {_fmt(nal)} ₽  |  Безнал: {_fmt(bn)} ₽  |  Итого: {_fmt(tot)} ₽")
-
-        total_nal = int(fin.get("total_nal", 0))
-        total_bn  = int(fin.get("total_bn",  0))
-        total     = int(fin.get("total",     0))
-
-        lines += [
-            "",
-            f"💵 Итого нал:    <b>{_fmt(total_nal)} ₽</b>",
-            f"💳 Итого безнал: <b>{_fmt(total_bn)} ₽</b>",
-            f"📊 Общая выручка: <b>{_fmt(total)} ₽</b>",
-            "",
-        ]
-
-        cash_start   = int(fin.get("cash_start",   0))
-        transfer_pre = int(fin.get("transfer_pre", 0))
-        transfer_on  = int(fin.get("transfer_on",  0))
-        card_total   = int(fin.get("card_total",   0))
-        cash_end     = int(fin.get("cash_end",     0))
-
-        if any([cash_start, transfer_pre, transfer_on, card_total, cash_end]):
-            lines.append("🏦 <b>КАССА</b>")
-            if cash_start:   lines.append(f"  Начало смены:     {_fmt(cash_start)} ₽")
-            if transfer_pre: lines.append(f"  Переводы до:      {_fmt(transfer_pre)} ₽")
-            if transfer_on:  lines.append(f"  Переводы на смене:{_fmt(transfer_on)} ₽")
-            if card_total:   lines.append(f"  На карте итого:   {_fmt(card_total)} ₽")
-            if cash_end:     lines.append(f"  Конец смены:      {_fmt(cash_end)} ₽")
-            lines.append("")
-
-    # ── Обход ──
-    lines += [
-        f"✅ <b>Принятие смены:</b> {cl.get('done', 0)}/{cl.get('total', 0)} пунктов",
-        f"📋 <b>Задачи дня:</b> {tasks.get('done', 0)}/{tasks.get('total', 0)}",
-    ]
-    if tasks.get("incomplete"):
-        lines.append("  Не выполнено: " + ", ".join(tasks["incomplete"]))
+        lines.append("⚠️ <b>Не отмечено:</b>")
+        for section, items in unchecked.items():
+            lines.append(f"  <b>{section}:</b>")
+            for item in items:
+                lines.append(f"    • {item}")
 
     lines += [
         "",
-        f"📸 Фото зон: {photos_total}",
+        f"<b>Задачи дня:</b> {tasks.get('done', 0)}/{tasks.get('total', 0)}",
+    ]
+    if tasks.get("incomplete"):
+        lines.append("Не выполнено: " + ", ".join(tasks["incomplete"]))
+
+    lines += [
+        "",
+        f"📸 Фото: {photos_total}",
+        f"💵 Касса: {h.get('cash') or '—'} ₽",
         f"🤝 Принимает: {h.get('next') or '—'}",
         f"⭐ Оценка: {RATING_MAP.get(h.get('rating', ''), '—')}",
     ]

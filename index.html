@@ -408,8 +408,23 @@ function getShiftNumber(){
   return Math.floor((today-start)/86400000)*2 + (shiftType==='night'?1:0);
 }
 
+// Пылесосить ПК: 32 шт (1–20 Зал, 21–30 VIP, 31–32 Прайм)
+// Цикл 60 смен (30 дней), активная фаза — первые 8 смен (4 дня), 4 ПК за смену
+function getVacuumTasks(n){
+  if(n%60>=8) return [];
+  const start = (n%60)*4+1;
+  return [0,1,2,3].map(i=>{
+    const pc=start+i;
+    const loc=pc<=20?'Общий зал':pc<=30?'VIP':'Прайм';
+    return {zone:'vacuum',text:`Пропылесосить ПК №${pc} (${loc})`};
+  });
+}
+
 function getAllTasks(){
   const n = getShiftNumber();
+
+  // Пылесос ПК (раз в месяц, 4 дня активной фазы)
+  const vacuum = getVacuumTasks(n);
 
   // Общий зал: 4 клавиатуры за смену → каждая раз в 5 смен (≈2.5 дня)
   const hallOff = (n%5)*4;
@@ -433,7 +448,7 @@ function getAllTasks(){
   }
 
   const extra = (WEEKLY_EXTRA[new Date().getDay()]||[]).map(t=>({zone:'extra',text:t}));
-  return [...keyboards,...extra];
+  return [...vacuum,...keyboards,...extra];
 }
 
 const DAY_SECTIONS = [
@@ -781,8 +796,22 @@ function renderTasks(){
   const n = getShiftNumber();
   document.getElementById('hub-tasks-desc').textContent = `Смена #${n+1} · ${tasks.length} задач`;
   const zh = label=>`<div style="padding:8px 14px 2px;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.5px">${label}</div>`;
+
+  // Карточка: пылесосить ПК (только в активную фазу)
+  const vacuumItems=[];
+  tasks.forEach((t,i)=>{ if(t.zone==='vacuum') vacuumItems.push({t,i}); });
+  let html='';
+  if(vacuumItems.length){
+    html+=`<div class="tasks-card" style="margin-bottom:8px">
+      <div class="tasks-hdr"><span>🌬️</span><span>ПЫЛЕСОСИТЬ ПК</span></div>
+      <div style="padding:8px 14px;font-size:11px;color:var(--text3);line-height:1.6;border-bottom:1px solid rgba(255,255,255,0.04)">Отключить от проводов → вынести на улицу / в коридор → пылесосить на обдув (внутренности + разъёмы видеокарты)</div>
+      ${vacuumItems.map(({t,i})=>taskRow(i,t.text)).join('')}
+    </div>`;
+  }
+
+  // Карточка: мытьё клавиатур
   const zoneLabels = {prime:'🔴 ПРАЙМ', vip:'🟡 VIP', hall:'🟢 ОБЩИЙ ЗАЛ'};
-  let html = `<div class="tasks-card">
+  html+=`<div class="tasks-card">
     <div class="tasks-hdr"><span>🧹</span><span>МЫТЬЁ КЛАВИАТУР</span></div>`;
   ['prime','vip','hall'].forEach(zone=>{
     const items=[];
@@ -792,6 +821,8 @@ function renderTasks(){
     items.forEach(({t,i})=>{ html+=taskRow(i,t.text); });
   });
   html+=`<div style="padding:10px 14px;font-size:11px;color:var(--text3);border-top:1px solid rgba(255,255,255,0.04)">⚠️ Задачи необязательны — можно отправить отчёт даже если не все выполнены</div></div>`;
+
+  // Карточка: задачи дня
   const extraItems=[];
   tasks.forEach((t,i)=>{ if(t.zone==='extra') extraItems.push({t,i}); });
   if(extraItems.length){

@@ -423,7 +423,7 @@ function getAllTasks(){
   // VIP: 1 клавиатура каждые 3 смены → каждая раз в 30 смен (≈2 недели)
   if(n%3===0){
     const vipIdx = Math.floor(n/3)%10;
-    keyboards.unshift({zone:'vip', text:`Помыть клавиатуру №${vipIdx+1} (VIP)`});
+    keyboards.unshift({zone:'vip', text:`Помыть клавиатуру №${vipIdx+21} (VIP)`});
   }
 
   // Прайм: 1 клавиатура каждые 21 смену → каждая раз в 42 смены (≈3 недели)

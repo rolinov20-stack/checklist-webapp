@@ -410,16 +410,28 @@ function getShiftNumber(){
 
 function getAllTasks(){
   const n = getShiftNumber();
-  const primeNum = (n%2)+1;
-  const vipOff   = (n%5)*2;
-  const hallOff  = (n%10)*2;
+
+  // Общий зал: 4 клавиатуры за смену → каждая раз в 5 смен (≈2.5 дня)
+  const hallOff = (n%5)*4;
   const keyboards = [
-    {zone:'prime', text:`Помыть клавиатуру №${primeNum} (Прайм)`},
-    {zone:'vip',   text:`Помыть клавиатуру №${vipOff+1} (VIP)`},
-    {zone:'vip',   text:`Помыть клавиатуру №${vipOff+2} (VIP)`},
-    {zone:'hall',  text:`Помыть клавиатуру №${hallOff+1} (Общий зал)`},
-    {zone:'hall',  text:`Помыть клавиатуру №${hallOff+2} (Общий зал)`},
+    {zone:'hall', text:`Помыть клавиатуру №${hallOff+1} (Общий зал)`},
+    {zone:'hall', text:`Помыть клавиатуру №${hallOff+2} (Общий зал)`},
+    {zone:'hall', text:`Помыть клавиатуру №${hallOff+3} (Общий зал)`},
+    {zone:'hall', text:`Помыть клавиатуру №${hallOff+4} (Общий зал)`},
   ];
+
+  // VIP: 1 клавиатура каждые 3 смены → каждая раз в 30 смен (≈2 недели)
+  if(n%3===0){
+    const vipIdx = Math.floor(n/3)%10;
+    keyboards.unshift({zone:'vip', text:`Помыть клавиатуру №${vipIdx+1} (VIP)`});
+  }
+
+  // Прайм: 1 клавиатура каждые 21 смену → каждая раз в 42 смены (≈3 недели)
+  if(n%21===0){
+    const primeIdx = Math.floor(n/21)%2;
+    keyboards.unshift({zone:'prime', text:`Помыть клавиатуру №${primeIdx+1} (Прайм)`});
+  }
+
   const extra = (WEEKLY_EXTRA[new Date().getDay()]||[]).map(t=>({zone:'extra',text:t}));
   return [...keyboards,...extra];
 }
@@ -767,23 +779,25 @@ function renderTasks(){
   if(!shiftType) return;
   const tasks = getAllTasks();
   const n = getShiftNumber();
-  const prime = tasks.filter(t=>t.zone==='prime');
-  const vip   = tasks.filter(t=>t.zone==='vip');
-  const hall  = tasks.filter(t=>t.zone==='hall');
-  const extra = tasks.filter(t=>t.zone==='extra');
   document.getElementById('hub-tasks-desc').textContent = `Смена #${n+1} · ${tasks.length} задач`;
   const zh = label=>`<div style="padding:8px 14px 2px;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.5px">${label}</div>`;
+  const zoneLabels = {prime:'🔴 ПРАЙМ', vip:'🟡 VIP', hall:'🟢 ОБЩИЙ ЗАЛ'};
   let html = `<div class="tasks-card">
-    <div class="tasks-hdr"><span>🧹</span><span>МЫТЬЁ КЛАВИАТУР</span><div class="day-pill">Смена #${n+1}</div></div>
-    ${zh('🔴 ПРАЙМ')}${prime.map((t,i)=>taskRow(i,t.text)).join('')}
-    ${zh('🟡 VIP')}${vip.map((t,i)=>taskRow(prime.length+i,t.text)).join('')}
-    ${zh('🟢 ОБЩИЙ ЗАЛ')}${hall.map((t,i)=>taskRow(prime.length+vip.length+i,t.text)).join('')}
-    <div style="padding:10px 14px;font-size:11px;color:var(--text3);border-top:1px solid rgba(255,255,255,0.04)">⚠️ Задачи необязательны — можно отправить отчёт даже если не все выполнены</div>
-  </div>`;
-  if(extra.length){
+    <div class="tasks-hdr"><span>🧹</span><span>МЫТЬЁ КЛАВИАТУР</span><div class="day-pill">Смена #${n+1}</div></div>`;
+  ['prime','vip','hall'].forEach(zone=>{
+    const items=[];
+    tasks.forEach((t,i)=>{ if(t.zone===zone) items.push({t,i}); });
+    if(!items.length) return;
+    html += zh(zoneLabels[zone]);
+    items.forEach(({t,i})=>{ html+=taskRow(i,t.text); });
+  });
+  html+=`<div style="padding:10px 14px;font-size:11px;color:var(--text3);border-top:1px solid rgba(255,255,255,0.04)">⚠️ Задачи необязательны — можно отправить отчёт даже если не все выполнены</div></div>`;
+  const extraItems=[];
+  tasks.forEach((t,i)=>{ if(t.zone==='extra') extraItems.push({t,i}); });
+  if(extraItems.length){
     html+=`<div class="tasks-card" style="margin-top:8px">
       <div class="tasks-hdr"><span>📋</span><span>ЗАДАЧИ ДНЯ</span><div class="day-pill">${DAYS[new Date().getDay()]}</div></div>
-      ${extra.map((t,i)=>taskRow(5+i,t.text)).join('')}
+      ${extraItems.map(({t,i})=>taskRow(i,t.text)).join('')}
     </div>`;
   }
   document.getElementById('tasks-body').innerHTML = html;

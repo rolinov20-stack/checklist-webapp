@@ -325,7 +325,7 @@ input[type=file]{display:none}
   </div>
   <div class="scroll-body" id="checklist-body"></div>
   <div style="padding:16px 16px 32px">
-    <button onclick="showScreen('hub')" style="width:100%;padding:15px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--green),#34d399);color:#fff;font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:0.5px;cursor:pointer">✅ Смена принята</button>
+    <button id="accept-btn" onclick="submitChecklist()" style="width:100%;padding:15px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--green),#34d399);color:#fff;font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;letter-spacing:0.5px;cursor:pointer">✅ Смена принята</button>
   </div>
 </div>
 
@@ -769,6 +769,60 @@ function toggleItem(secId,ii){
   document.getElementById('ci-'+k).replaceWith(makeCheckItem(secId,ii,sec.items[ii]));
   updateChecklistProgress();
   saveState();
+}
+
+async function submitChecklist(){
+  const btn = document.getElementById('accept-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Отправка...';
+
+  const secs = shiftType==='day' ? DAY_SECTIONS : NIGHT_SECTIONS;
+  const now = new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  const shiftLabel = shiftType==='day' ? 'Дневная 🌅' : 'Ночная 🌙';
+
+  let done=0, fail=0, total=0;
+  const failedBySection={};
+  secs.forEach(sec=>{
+    sec.items.forEach((item,ii)=>{
+      const s = checkState[sec.id+'_'+ii];
+      total++;
+      if(s===true) done++;
+      else if(s==='fail'){
+        fail++;
+        if(!failedBySection[sec.title]) failedBySection[sec.title]=[];
+        failedBySection[sec.title].push(item);
+      }
+    });
+  });
+
+  let text = `📋 <b>ПРИНЯТИЕ СМЕНЫ — CYBER SPACE</b>\n\n🕐 ${now}  |  ${shiftLabel}\n`;
+  text += `✅ Выполнено: ${done} / ${total}`;
+  if(fail>0){
+    text += `\n🔴 Недочёты: ${fail}`;
+    text += '\n';
+    for(const [sec,items] of Object.entries(failedBySection)){
+      text += `\n<b>${sec}:</b>`;
+      items.forEach(item=>{ text+=`\n  • ${item}`; });
+    }
+  } else {
+    text += '\n\n✨ Все пункты выполнены!';
+  }
+
+  try{
+    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:REPORT_CHAT_ID_JS, text, parse_mode:'HTML'})
+    });
+    if(!res.ok) throw new Error();
+    showToast('✅ Отчёт по принятию отправлен');
+    btn.textContent = '✅ Отчёт отправлен';
+    setTimeout(()=>{ btn.disabled=false; btn.textContent='✅ Смена принята'; showScreen('hub'); }, 1500);
+  } catch(e){
+    showToast('⚠️ Не удалось отправить');
+    btn.disabled=false;
+    btn.textContent='✅ Смена принята';
+  }
 }
 
 function updateChecklistProgress(){

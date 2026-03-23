@@ -783,7 +783,7 @@ function renderTasks(){
   const zh = label=>`<div style="padding:8px 14px 2px;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.5px">${label}</div>`;
   const zoneLabels = {prime:'🔴 ПРАЙМ', vip:'🟡 VIP', hall:'🟢 ОБЩИЙ ЗАЛ'};
   let html = `<div class="tasks-card">
-    <div class="tasks-hdr"><span>🧹</span><span>МЫТЬЁ КЛАВИАТУР</span><div class="day-pill">Смена #${n+1}</div></div>`;
+    <div class="tasks-hdr"><span>🧹</span><span>МЫТЬЁ КЛАВИАТУР</span></div>`;
   ['prime','vip','hall'].forEach(zone=>{
     const items=[];
     tasks.forEach((t,i)=>{ if(t.zone===zone) items.push({t,i}); });

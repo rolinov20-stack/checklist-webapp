@@ -129,8 +129,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:1000;
 .check-item:active{background:rgba(255,255,255,0.03)}
 .check-item.done{background:rgba(16,185,129,0.04)}
 .check-item.done .item-text{color:var(--text3);text-decoration:line-through}
+.check-item.fail{background:rgba(239,68,68,0.06)}
+.check-item.fail .item-text{color:var(--red)}
 .checkmark{width:20px;height:20px;border-radius:6px;flex-shrink:0;margin-top:2px;border:1.5px solid var(--text3);display:flex;align-items:center;justify-content:center;transition:all 0.2s;font-size:11px;font-weight:700}
 .check-item.done .checkmark{background:var(--green);border-color:var(--green);color:#fff}
+.check-item.fail .checkmark{background:var(--red);border-color:var(--red);color:#fff}
 .item-content{flex:1;min-width:0}
 .item-text{font-size:13.5px;line-height:1.5;color:var(--text)}
 .section-divider{height:8px;background:var(--bg);border-top:1px solid rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.03)}
@@ -746,20 +749,21 @@ function renderChecklist(){
 
 function makeCheckItem(secId,ii,text){
   const k = secId+'_'+ii;
-  const done = checkState[k];
+  const state = checkState[k]; // false=unchecked, true=done, 'fail'=not done
   const el = document.createElement('div');
   el.id = 'ci-'+k;
-  el.className = 'check-item'+(done?' done':'');
+  el.className = 'check-item'+(state===true?' done':state==='fail'?' fail':'');
   el.onclick = ()=>toggleItem(secId,ii);
   el.innerHTML = `
-    <div class="checkmark">${done?'✓':''}</div>
+    <div class="checkmark">${state===true?'✓':state==='fail'?'✗':''}</div>
     <div class="item-content"><div class="item-text">${text}</div></div>`;
   return el;
 }
 
 function toggleItem(secId,ii){
   const k = secId+'_'+ii;
-  checkState[k] = !checkState[k];
+  // Цикл: false → true (зелёный) → 'fail' (красный) → false
+  checkState[k] = checkState[k]===false ? true : checkState[k]===true ? 'fail' : false;
   const secs = shiftType==='day' ? DAY_SECTIONS : NIGHT_SECTIONS;
   const sec = secs.find(s=>s.id===secId);
   document.getElementById('ci-'+k).replaceWith(makeCheckItem(secId,ii,sec.items[ii]));
@@ -772,7 +776,7 @@ function updateChecklistProgress(){
   let total=0, done=0;
   secs.forEach((sec,si)=>{
     let sd=0;
-    sec.items.forEach((_,ii)=>{ if(checkState[sec.id+'_'+ii]){done++;sd++;} total++; });
+    sec.items.forEach((_,ii)=>{ if(checkState[sec.id+'_'+ii]===true){done++;sd++;} total++; });
     const sp = document.getElementById('sp-'+sec.id);
     const sc = document.getElementById('sc-'+sec.id);
     if(sp) sp.style.width=(sec.items.length?sd/sec.items.length*100:0)+'%';
@@ -962,7 +966,7 @@ async function submitShift(){
   sb.disabled=true;
   const secs=shiftType==='day'?DAY_SECTIONS:NIGHT_SECTIONS;
   const total=secs.reduce((a,s)=>a+s.items.length,0);
-  const done=Object.values(checkState).filter(Boolean).length;
+  const done=Object.values(checkState).filter(v=>v===true).length;
   const zonesDone=CLOSING_ZONES.filter(z=>(zonePhotos[z.id]||[]).length>0).length;
   const zonePhotosCount=Object.values(zonePhotos).reduce((a,p)=>a+p.length,0);
   const now=new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
@@ -975,7 +979,7 @@ async function submitShift(){
 
   const unchecked={};
   secs.forEach(sec=>{
-    const missed=sec.items.filter((_,ii)=>!checkState[sec.id+'_'+ii]).map(t=>t);
+    const missed=sec.items.filter((_,ii)=>checkState[sec.id+'_'+ii]==='fail');
     if(missed.length) unchecked[sec.title]=missed;
   });
 
